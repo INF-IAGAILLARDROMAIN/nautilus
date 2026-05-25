@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Documents personnels (convocation, dp, notices)
+# NE JAMAIS pousser sur GitHub public
+_personnel/

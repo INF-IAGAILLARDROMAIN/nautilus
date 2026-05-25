@@ -1,26 +1,193 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-inter);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================
+ * NAUTILUS — Charte graphique
+ * Contraintes UX : lisibilité plein soleil bateau + atelier sombre
+ * Contrastes AAA (ratio 7:1) sur texte principal
+ * ============================================ */
+
+:root {
+  /* === MODE CLAIR HAUTE VISIBILITÉ (par défaut — bateau / soleil intense) ===
+     Noir pur sur blanc pur · Contraste maximum AAA · Bordures épaisses · Boutons larges */
+  --background: #FFFFFF;             /* blanc pur */
+  --foreground: #000000;             /* noir pur · contraste max */
+
+  --card: #FFFFFF;
+  --card-foreground: #000000;
+
+  --popover: #FFFFFF;
+  --popover-foreground: #000000;
+
+  /* Bleu marine — couleur de marque */
+  --primary: #003D6B;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #EBEEF2;
+  --secondary-foreground: #000000;
+
+  --muted: #EBEEF2;
+  --muted-foreground: #000000;       /* texte secondaire en noir pur aussi */
+
+  /* Orange maritime — CTA, alertes positives */
+  --accent: #E85D04;
+  --accent-foreground: #FFFFFF;
+
+  --destructive: #C81E1E;
+  --destructive-foreground: #FFFFFF;
+
+  --border: #2A2A2A;                 /* bordures gris très foncé (contraste élevé sans surcharge) */
+  --input: #2A2A2A;
+  --ring: #003D6B;
+
+  --radius: 0.5rem;
+
+  /* Chart colors (Recharts / stats) */
+  --chart-1: #003D6B;
+  --chart-2: #E85D04;
+  --chart-3: #0E8C3A;
+  --chart-4: #0066B3;
+  --chart-5: #A85700;
+
+  /* Sidebar */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #000000;
+  --sidebar-primary: #003D6B;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EBEEF2;
+  --sidebar-accent-foreground: #003D6B;
+  --sidebar-border: #2A2A2A;
+  --sidebar-ring: #003D6B;
+}
+
+.dark {
+  /* === MODE SOMBRE (atelier) === */
+  --background: #0F1419;
+  --foreground: #F5F5F5;             /* contraste 18.3:1 AAA */
+
+  --card: #1A2028;
+  --card-foreground: #F5F5F5;
+
+  --popover: #1A2028;
+  --popover-foreground: #F5F5F5;
+
+  /* Bleu clair lumineux pour fond sombre */
+  --primary: #5BA4E8;
+  --primary-foreground: #0F1419;
+
+  --secondary: #1A2028;
+  --secondary-foreground: #F5F5F5;
+
+  --muted: #232C36;
+  --muted-foreground: #B8B8B8;       /* contraste 9.2:1 AAA */
+
+  /* Orange clair pour fond sombre */
+  --accent: #FF8533;
+  --accent-foreground: #0F1419;
+
+  --destructive: #FF6B6B;
+  --destructive-foreground: #0F1419;
+
+  --border: #4A4A4A;
+  --input: #4A4A4A;
+  --ring: #5BA4E8;
+
+  --chart-1: #5BA4E8;
+  --chart-2: #FF8533;
+  --chart-3: #3DDC84;
+  --chart-4: #5BC0EB;
+  --chart-5: #FFB84D;
+
+  --sidebar: #1A2028;
+  --sidebar-foreground: #F5F5F5;
+  --sidebar-primary: #5BA4E8;
+  --sidebar-primary-foreground: #0F1419;
+  --sidebar-accent: #232C36;
+  --sidebar-accent-foreground: #5BA4E8;
+  --sidebar-border: #4A4A4A;
+  --sidebar-ring: #5BA4E8;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  html {
+    @apply font-sans antialiased;
+  }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Lisibilité mécano sur le terrain — boutons et inputs larges */
+  button, [role="button"], a.btn {
+    min-height: 44px;
+  }
+
+  /* Mobile : boutons et inputs encore plus gros (mains gantées / sel / soleil) */
+  @media (max-width: 768px) {
+    button, [role="button"], a.btn {
+      min-height: 56px;
+      font-size: 1rem;
+    }
+    input, select, textarea {
+      min-height: 56px;
+      font-size: 1.125rem; /* 18px — lisibilité mécano */
+    }
+  }
+
+  /* Tabular numbers sur KPIs (chiffres alignés) */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
 }

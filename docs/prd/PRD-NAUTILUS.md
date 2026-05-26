@@ -214,7 +214,6 @@ L'atelier est l'interface entre le client final et le constructeur moteur (**Suz
 ### 5.1 Stack
 | Couche | Techno | Justification |
 |---|---|---|
-| **Vitrine** | **Astro + îlots React** | Site marketing → perf max, SEO, Lighthouse 100. Stack alignée avec INF-IA (Kosmos/ING+) |
 | **App métier** | **Next.js 16 + React 19 + TypeScript + Tailwind v4 + shadcn/ui** | Couvre BC01-#4 (dynamique riche). Cohérent avec ECF Vite & Gourmand |
 | **Back-end** | **NestJS 11 + TypeScript** | Architecture modulaire, validation DTO, cohérent avec V&G |
 | **BDD relationnelle** | **PostgreSQL (Neon) + Prisma 7** | Couvre BC02-#5 et #6 SQL |
@@ -228,9 +227,9 @@ L'atelier est l'interface entre le client final et le constructeur moteur (**Suz
 ```
 INF-IAGAILLARDROMAIN/nautilus (GitHub public)
 ├── apps/
-│   ├── vitrine/      # Astro — landing page Nautilus
 │   ├── web/          # Next.js — app gestion atelier
 │   └── api/          # NestJS — back-end REST
+│   (vitrine/         # Astro — ajoutée post-examen pour RANKIA)
 ├── database/
 │   ├── create_tables.sql
 │   └── seed_data.sql
@@ -314,17 +313,23 @@ Pour considérer Nautilus "prêt pour le jury" :
 
 ---
 
-## 9. Planning macro (à partir du 23/05)
+## 9. Planning macro (refonte 2026-05-26)
 
-| Semaine | Période | Objectifs |
-|---|---|---|
-| **S0** | 23-25 mai | Cadrage + scaffolding + maquettes + 1er déploiement vide |
-| **S1** | 26-31 mai | API : auth, modèles Prisma, modules Client + Bateau |
-| **S2** | 1-7 juin | API : OR, Devis, Stock + Front-end auth & listings |
-| **S3** | 8-14 juin | Front-end : tous les écrans + intégration API |
-| **S4** | 15-21 juin | Feature waouh (alertes) + MongoDB stats + Vitrine Astro + 1er dépôt Studi |
-| **S5** | 22-28 juin | Dossier projet + DP + diaporama + répétitions + impression reliure + logistique |
-| **29 juin** | Lundi | 🎯 EXAMEN |
+> **Stratégie** : front-first avec mocks (S1-S2) → dérive du back (S3-S4) → livrables papier et répétitions (S5).
+> **Vitrine Astro retirée** du périmètre examen — gardée post-29/06 pour la commercialisation RANKIA.
+> **Rédaction Dossier Projet démarre dès S1** (pas en S5) pour absorber les 50 pages sans étouffer.
+
+| Semaine | Période | Objectifs | Jalon Studi |
+|---|---|---|---|
+| **S0** | 23-25 mai | Cadrage + repo GitHub + 7 pages front avec mocks (déjà fait) | — |
+| **S1** | 26-31 mai | Front : pages création (OR/Devis/Facture) + CRUD Clients/Bateaux/Pièces (mocks). MCD complet. Démarrer Dossier Projet (§Présentation + §Contexte métier) | — |
+| **S2** | 1-7 juin | Front : feature CORE scan plaque (mock OCR) + détails + vue mécano + Hivernage/Sécurité. Dossier Projet 60 % | **1er dépôt ~9/06** |
+| **S3** | 8-14 juin | Back : scaffold NestJS monorepo + Prisma + Postgres + auth JWT + modules Client/Bateau/OR + branchement front ↔ API | — |
+| **S4** | 15-21 juin | Back : Devis/Facture/Pièce/Garantie/Sécurité + OCR Tesseract.js réel + MongoDB stats + tests parcours critique | **2e dépôt ~17/06** |
+| **S5** | 22-28 juin | Déploiement Vercel + 3 comptes démo + livrables PDF + reliure + diaporama + répétitions x3 | **Dépôt final ~26/06** + **diaporama ~27/06** |
+| **29 juin** | Lundi | 🎯 EXAMEN Villepinte 08h30-18h30 | — |
+
+> Détail journalier S1→S5 dans `HANDOFF.md` (section "Détail journalier").
 
 ---
 

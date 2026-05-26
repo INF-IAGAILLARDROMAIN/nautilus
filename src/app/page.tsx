@@ -98,17 +98,12 @@ export default function LoginPage() {
             </CardContent>
           </Card>
 
-          {/* Astuce mode visu */}
-          <p className="text-xs text-center text-muted-foreground">
-            🌞 Au soleil ? Bascule en mode <strong>Haute visibilité</strong> via
-            l'icône en haut à droite.
-          </p>
         </div>
       </main>
 
       {/* Footer */}
       <footer className="py-6 px-4 text-center text-sm text-muted-foreground">
-        Nautilus © 2026 — Romain Gaillard · TP DWWM Studi
+        Nautilus © 2026
       </footer>
     </div>
   );

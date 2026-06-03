@@ -17,9 +17,9 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-40 border-t bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80"
+      className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/80"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-      aria-label="Navigation principale"
+      aria-label="Navigation principale (mobile)"
     >
       <ul className="flex items-center justify-around max-w-3xl mx-auto">
         {items.map((item) => {

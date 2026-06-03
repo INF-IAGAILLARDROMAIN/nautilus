@@ -1,135 +1,100 @@
 # Nautilus
 
-**SaaS de gestion d'atelier nautique** — Web app responsive pour mécaniciens, chefs d'atelier et réception d'un chantier naval.
-
-> Projet réalisé dans le cadre du **TP Développeur Web et Web Mobile (RNCP 37674)** — Studi · Session juin/juillet 2026
-
----
-
-## 🎯 Le projet
-
-Nautilus permet à un atelier nautique (de 3 à 15 personnes) de piloter son activité :
-
-- 📥 Réception des **demandes clients** (pannes, devis, hivernage)
-- 🛠️ Gestion des **ordres de réparation (OR)** avec workflow (Reçu → Accepté → Préparation → Réparation → Livré → Facturé)
-- 📝 Génération de **devis PDF** et envoi par email avec validation client par lien unique
-- 💰 Suivi des **factures** (émission, encaissement, retards)
-- 👥 **Dispatch intelligent** : le chef d'atelier attribue les urgences au mécano suggéré (dernier intervenant sur le bateau, avec fallback automatique si en congé)
-- 🚤 **Fiche bateau enrichie** : historique des interventions, sécurité réglementaire, garantie constructeur, préconisations de maintenance préventive
-- 📷 **Feature CORE** : scan plaque moteur → OCR → résumé instantané du bateau (historique, opérations dues, pièces à prévoir)
-- 📊 **Dashboard chef d'atelier** : KPIs, alertes urgentes triées FIFO, équipe avec charge, OR en cours
-
-### Spécificités métier nautique
-
-- **Cycle saisonnier** : Hivernage (oct-nov) + Déshivernage (mar-avr) avec checklists standardisées
-- **Sécurité réglementaire** : inventaire des équipements (feux à main, fusées, gilets, extincteur) avec dates de péremption + décharges de responsabilité PDF si le client refuse un remplacement préconisé
-- **Garantie constructeur** : workflow B2B (Suzuki, Yamaha, Mercury, Mercruiser, Volvo Penta, Honda, Tohatsu)
-- **Dépannage urgent** : workflow rapide sans devis bloquant, briefing mécano avant intervention via fiche résumé
+> **Application web de gestion d'atelier nautique**, dotée d'un moteur de recherche en langage naturel propulsé par un agent IA.
+>
+> Projet de fin de formation — **TP Développeur Web et Web Mobile (RNCP 37674)**, Studi, session juin-juillet 2026. Auteur : Romain Gaillard.
 
 ---
+
+## 🎯 Le produit en une phrase
+
+Nautilus permet à un chef d'atelier nautique d'enregistrer ses clients et leurs bateaux, de **chiffrer des devis**, de **suivre les ordres de réparation** jusqu'à la **facturation**, et de retrouver toute son information en interrogeant la base de données **en français** via un agent IA.
+
+## ⚙️ Fonctionnalités du périmètre examen
+
+### 4 entités liées
+```
+Client  →  Bateau  →  Devis  →  OR (Ordre de Réparation)
+                                  │
+                                  └─→ [PDF Facture généré quand statut = "facturé"]
+```
+
+### 3 briques fonctionnelles
+1. **CRUD complet** sur les 4 entités (créer, lire, modifier, supprimer)
+2. **🌟 Moteur de recherche IA** en langage naturel — la fonctionnalité signature
+3. **Génération PDF** côté serveur (devis / facture, imprimables et téléchargeables)
+
+### Flux métier
+1. Le chef crée un **Devis** sur un bateau (statut `brouillon → envoyé`)
+2. Le client accepte → statut `validé` → **un OR est créé automatiquement**
+3. Le mécano réalise le travail (statut OR `créé → en cours → terminé`)
+4. Le chef facture → statut `facturé` → **le PDF Facture est généré**
 
 ## 🛠️ Stack technique
 
-### Front-end
+### Front-end (`/`)
 - **Next.js 16** (App Router) + **React 19** + **TypeScript** (strict)
 - **Tailwind CSS v4** + **shadcn/ui** + **Lucide React**
-- **next-themes** (clair / sombre)
-- Police **Inter** via `next/font`
+- **React Hook Form** + **Zod** (validation)
+- **TanStack Query** (cache des appels API)
+- **Supabase Auth** côté client
 
-### Back-end *(à venir)*
-- **NestJS 11** + **Prisma 7** + **PostgreSQL (Neon)**
-- **MongoDB Atlas** pour les statistiques agrégées
-- **JWT** (bcrypt + passport)
-- **Nodemailer** pour les emails transactionnels
+### Back-end (`/backend`)
+- **NestJS 11** + **TypeScript**
+- **Prisma 6** + **PostgreSQL** (hébergé sur **Neon**)
+- **MongoDB Atlas** pour l'historique des recherches IA *(justifie l'usage NoSQL au côté du relationnel)*
+- **Helmet**, **CORS strict**, **Throttler** (rate limiting), validation DTO globale
+- Architecture stricte **Module → Controller → Service → DTO**
 
-### Architecture cible
-```
-nautilus/
-├── apps/
-│   ├── vitrine/     # Astro — site marketing
-│   ├── web/         # Next.js — app métier (le code actuel)
-│   └── api/         # NestJS — back-end REST
-├── database/
-└── docs/
-```
+### Hébergement (cible)
+- Front : **Vercel** · Back : **Railway** · BDD : **Neon** + **MongoDB Atlas**
 
-> ⚠️ État actuel : le repo contient l'app **Next.js** (`apps/web` future). Le scaffolding `apps/api` est prévu pour la semaine suivante.
-
----
-
-## 🎨 Contraintes UX
-
-Nautilus s'utilise dans deux contextes extrêmes :
-- ☀️ **Plein soleil sur un bateau** (luminosité écrasante)
-- 🌑 **Atelier sombre** (faible luminosité)
-
-→ La charte est construite autour d'une règle non négociable : la **lisibilité avant l'esthétique**.
-
-- Contrastes **AAA (ratio 21:1)** sur le texte principal
-- **Mode clair = haute visibilité** par défaut (noir pur sur blanc pur)
-- **Mode sombre** pour l'atelier
-- **Texte ≥ 18 px** sur mobile (lecture rapide)
-- **Boutons ≥ 56 px** (mains gantées / sales / sel)
-- **Touch targets ≥ 44 px** (norme Apple/Material)
-
----
-
-## 🚀 Installation locale
+## 🚀 Démarrage local
 
 ### Pré-requis
 - Node.js ≥ 20
 - npm ≥ 10
+- Un compte gratuit **Neon** (BDD PostgreSQL) — https://neon.tech
 
-### Démarrage
-
+### Front-end
 ```bash
-# Cloner le repo
 git clone https://github.com/INF-IAGAILLARDROMAIN/nautilus.git
 cd nautilus
-
-# Installer les dépendances
 npm install
-
-# Démarrer le serveur de dev
 npm run dev
 ```
+→ http://localhost:3000
 
-L'app est accessible sur **http://localhost:3000**.
+### Back-end
+```bash
+cd backend
+npm install
+cp .env.example .env   # puis ajouter ton DATABASE_URL Neon
+npx prisma generate
+npx prisma migrate dev --name init
+npm run start:dev
+```
+→ http://localhost:4000/api
 
-### Pages disponibles
-- `/` — Connexion (fake login, valide n'importe quel email/mdp)
-- `/dashboard` — Dashboard chef d'atelier
-- `/dashboard/urgences` — Liste des urgences à dispatcher (5 premières, tri FIFO)
-- `/dashboard/or` — Ordres de réparation
-- `/dashboard/devis` — Devis
-- `/dashboard/factures` — Factures
+## 📚 Documentation projet
 
----
+| Document | Contenu |
+|---|---|
+| [docs/examen/PRD-NAUTILUS-EXAMEN-V1.md](docs/examen/PRD-NAUTILUS-EXAMEN-V1.md) | PRD figé du périmètre examen |
+| [docs/examen/PRD-LIVRABLES-EXAMEN.md](docs/examen/PRD-LIVRABLES-EXAMEN.md) | Modalités d'examen Studi (livrables, dépôts, jour J) |
+| [docs/examen/dossier-projet/](docs/examen/dossier-projet/) | Squelette du Dossier Projet (livrable jury) |
+| [docs/architecture/](docs/architecture/) | Parcours utilisateur et architecture |
+| [docs/charte-graphique/](docs/charte-graphique/) | Charte graphique |
+| [backend/README.md](backend/README.md) | Guide spécifique back NestJS |
 
-## 📋 Comptes de test *(à venir avec le back-end)*
+## 🎨 Contraintes UX
 
-| Rôle | Email | Mot de passe |
-|---|---|---|
-| Admin | admin@nautilus-demo.fr | *(à définir)* |
-| Manager (chef d'atelier) | manager@nautilus-demo.fr | *(à définir)* |
-| Technicien (mécano) | tech@nautilus-demo.fr | *(à définir)* |
+Nautilus s'utilise dans deux contextes :
+- ☀️ **Plein soleil sur un bateau** (luminosité écrasante)
+- 🌑 **Atelier sombre** (faible luminosité)
 
----
-
-## 📅 Roadmap
-
-- ✅ **S0** (23-25 mai) — Cadrage + scaffolding Next.js + charte graphique + dashboard chef d'atelier
-- 🟡 **S1** (26-31 mai) — API NestJS + Prisma + auth JWT + modules Client + Bateau
-- 🔲 **S2** (1-7 juin) — Modules OR/Devis/Stock + intégration API côté front
-- 🔲 **S3** (8-14 juin) — Tous les écrans front (CRUD complets)
-- 🔲 **S4** (15-21 juin) — Feature CORE scan plaque moteur + stats MongoDB + vitrine Astro
-- 🔲 **S5** (22-28 juin) — Dossier de Projet + DP + diaporama + répétitions + impression
-- 🎯 **29 juin** — Examen à Villepinte
-
----
+→ **Lisibilité avant l'esthétique** : contrastes AAA, texte ≥ 18 px sur mobile, boutons ≥ 56 px (mains gantées / sales / sel), modes clair + sombre.
 
 ## 📝 Auteur
 
-**Romain Gaillard** — Formation TP Développeur Web et Web Mobile (Studi, 2026)
-
-Ancien mécanicien nautique en reconversion développeur. Le projet Nautilus est nourri par cette double expertise terrain + tech.
+**Romain Gaillard** — Ancien mécanicien nautique en reconversion développeur. Le projet Nautilus est nourri par cette double expertise terrain + tech.

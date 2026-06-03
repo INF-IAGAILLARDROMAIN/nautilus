@@ -7,30 +7,22 @@ import {
   Bell,
   Search,
   ChevronRight,
-  AlertTriangle,
-  Plus,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { AlerteItem } from "@/components/alerte-item";
-import { EquipeSection } from "@/components/equipe-section";
-import { alertes, equipe } from "@/lib/mocks";
-import { trierAlertes } from "@/lib/mecano-suggestion";
 
-const nonAttribuees = trierAlertes(alertes.filter((a) => !a.assigneeName));
-const aDispatcher = nonAttribuees.length;
-const alertesAffichees = nonAttribuees.slice(0, 3);
+// Périmètre Option B — version examen :
+//   1 seul rôle (chef d'atelier) · 4 entités (Client → Bateau → Devis → OR) ·
+//   Facture = PDF généré quand OR passe au statut "facturé".
 
 type OrdreStatus =
-  | "RECU"
-  | "ACCEPTE"
-  | "EN_PREPARATION"
-  | "EN_REPARATION"
-  | "LIVRE"
-  | "URGENCE";
+  | "CREE"
+  | "EN_COURS"
+  | "TERMINE"
+  | "FACTURE";
 
 const ordresJour: {
   id: string;
@@ -38,73 +30,51 @@ const ordresJour: {
   client: string;
   type: string;
   status: OrdreStatus;
-  tech?: string;
 }[] = [
-  {
-    id: "OR-0141",
-    bateau: "La Brise",
-    client: "Martin",
-    type: "Dépannage urgent",
-    status: "URGENCE",
-    tech: "Romain",
-  },
   {
     id: "OR-0142",
     bateau: "Le Mistral",
     client: "Dupont",
     type: "Hivernage",
-    status: "EN_PREPARATION",
-    tech: "Pierre",
+    status: "EN_COURS",
   },
   {
     id: "OR-0139",
     bateau: "Petit Bleu",
     client: "Petit",
     type: "Entretien moteur",
-    status: "EN_REPARATION",
-    tech: "Romain",
+    status: "EN_COURS",
   },
   {
     id: "OR-0140",
     bateau: "L'Échappée",
     client: "Bernard",
     type: "Entretien moteur",
-    status: "LIVRE",
+    status: "TERMINE",
   },
 ];
 
 function statusBadge(status: OrdreStatus) {
   switch (status) {
-    case "URGENCE":
-      return {
-        className:
-          "bg-destructive text-destructive-foreground border-transparent animate-pulse",
-        label: "URGENCE",
-      };
-    case "RECU":
+    case "CREE":
       return {
         className: "bg-muted text-muted-foreground border-transparent",
-        label: "Reçu",
+        label: "Créé",
       };
-    case "ACCEPTE":
-      return {
-        className: "bg-chart-4 text-white border-transparent",
-        label: "Accepté",
-      };
-    case "EN_PREPARATION":
-      return {
-        className: "bg-chart-5 text-white border-transparent",
-        label: "En préparation",
-      };
-    case "EN_REPARATION":
+    case "EN_COURS":
       return {
         className: "bg-primary text-primary-foreground border-transparent",
-        label: "En réparation",
+        label: "En cours",
       };
-    case "LIVRE":
+    case "TERMINE":
       return {
         className: "bg-chart-3 text-white border-transparent",
-        label: "Livré",
+        label: "Terminé",
+      };
+    case "FACTURE":
+      return {
+        className: "bg-chart-4 text-white border-transparent",
+        label: "Facturé",
       };
   }
 }
@@ -114,7 +84,7 @@ function statusBadge(status: OrdreStatus) {
 export default function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background pb-24">
-      {/* Header sticky — bleu marine plein, identité forte */}
+      {/* Header sticky — identité Nautilus */}
       <header className="sticky top-0 z-30 bg-primary text-primary-foreground shadow-md">
         <div className="flex items-center justify-between px-4 py-3 max-w-3xl mx-auto">
           <Link
@@ -146,47 +116,33 @@ export default function DashboardPage() {
       </header>
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-8">
-        {/* ============================================
-            BANDEAU URGENCES — sobre, accent ciblé
-            ============================================ */}
-        {aDispatcher > 0 && (
-          <Link
-            href="/dashboard/urgences"
-            className="block w-full rounded-2xl bg-card border border-l-4 border-l-destructive p-5 flex items-center gap-4 active:scale-[0.99] transition-transform hover:bg-muted/30"
-          >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-destructive/10">
-              <AlertTriangle className="h-6 w-6 text-destructive" strokeWidth={2.5} />
-            </div>
-            <div className="flex-1">
-              <div className="text-4xl font-bold tabular-nums leading-none text-destructive">
-                {aDispatcher}
-              </div>
-              <div className="text-xs uppercase tracking-widest font-bold mt-1.5 text-muted-foreground">
-                {aDispatcher > 1 ? "urgences à dispatcher" : "urgence à dispatcher"}
-              </div>
-            </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-          </Link>
-        )}
-
-        {/* Search bar */}
+        {/* Barre de recherche — futur moteur de recherche IA en langage naturel */}
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
           <Input
             type="search"
-            placeholder="Rechercher un bateau, un client…"
+            placeholder="Demande en français : « bateau de Dupont », « OR en cours », « devis impayés »…"
             className="pl-11 h-12 text-base"
           />
         </div>
 
-        {/* ============================================
-            ACTIONS RAPIDES — créer en 1 tap (workflow flexible)
-            ============================================ */}
+        {/* Actions rapides — création */}
         <section>
           <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
-            Créer en 1 tap
+            Créer
           </h2>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <Link
+              href="/dashboard/clients/nouveau"
+              className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border-2 border-primary/30 hover:bg-primary/5 active:scale-95 transition-transform"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white">
+                <Anchor className="h-5 w-5" strokeWidth={2.5} />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-wide text-center leading-tight">
+                Nouveau<br />client
+              </span>
+            </Link>
             <Link
               href="/dashboard/devis/nouveau"
               className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border-2 border-accent/30 hover:bg-accent/5 active:scale-95 transition-transform"
@@ -198,37 +154,10 @@ export default function DashboardPage() {
                 Nouveau<br />devis
               </span>
             </Link>
-            <Link
-              href="/dashboard/or/nouveau"
-              className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border-2 border-primary/30 hover:bg-primary/5 active:scale-95 transition-transform"
-            >
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white">
-                <Wrench className="h-5 w-5" strokeWidth={2.5} />
-              </div>
-              <span className="text-xs font-bold uppercase tracking-wide text-center leading-tight">
-                Nouvel<br />OR
-              </span>
-            </Link>
-            <Link
-              href="/dashboard/factures/nouveau"
-              className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border-2 border-chart-4/30 hover:bg-chart-4/5 active:scale-95 transition-transform"
-            >
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-chart-4 text-white">
-                <FileText className="h-5 w-5" strokeWidth={2.5} />
-              </div>
-              <span className="text-xs font-bold uppercase tracking-wide text-center leading-tight">
-                Nouvelle<br />facture
-              </span>
-            </Link>
           </div>
-          <p className="text-xs text-muted-foreground text-center mt-2.5">
-            💡 Tu peux créer à n'importe quelle étape — pas obligé de faire devis → OR → facture
-          </p>
         </section>
 
-        {/* ============================================
-            KPIs grand format — cliquables vers chaque liste
-            ============================================ */}
+        {/* KPIs */}
         <section className="grid grid-cols-3 gap-3">
           <Link
             href="/dashboard/devis"
@@ -263,61 +192,19 @@ export default function DashboardPage() {
               6
             </div>
             <div className="text-[11px] uppercase tracking-wide font-bold text-chart-4 leading-tight">
-              Factures
+              Facturés
             </div>
           </Link>
         </section>
 
-        {/* ============================================
-            ALERTES — bateau en GROS titre
-            ============================================ */}
+        {/* OR récents */}
         <section>
           <div className="flex items-end justify-between mb-3">
             <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              À traiter
+              OR récents · {ordresJour.length}
             </h2>
             <Link
-              href="#"
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              Tout voir
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {alertesAffichees.map((a) => (
-              <AlerteItem key={a.id} alerte={a} />
-            ))}
-          </div>
-        </section>
-
-        {/* ============================================
-            ÉQUIPE
-            ============================================ */}
-        <section>
-          <div className="flex items-end justify-between mb-3">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Mon équipe · {equipe.length}
-            </h2>
-            <Link
-              href="#"
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              Détail
-            </Link>
-          </div>
-          <EquipeSection equipe={equipe} />
-        </section>
-
-        {/* ============================================
-            OR EN COURS — bateau en titre fort
-            ============================================ */}
-        <section>
-          <div className="flex items-end justify-between mb-3">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              OR en cours · {ordresJour.length}
-            </h2>
-            <Link
-              href="#"
+              href="/dashboard/or"
               className="text-sm font-medium text-primary hover:underline"
             >
               Tout voir
@@ -343,9 +230,6 @@ export default function DashboardPage() {
                     </div>
                     <p className="text-sm text-muted-foreground">
                       {or.type} · {or.client}
-                      {or.tech && (
-                        <span className="ml-1">· 👷 {or.tech}</span>
-                      )}
                     </p>
                     <p className="text-xs text-muted-foreground font-mono">
                       {or.id}

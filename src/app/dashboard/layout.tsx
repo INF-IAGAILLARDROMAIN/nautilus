@@ -1,5 +1,5 @@
 import { BottomNav } from "@/components/bottom-nav";
-import { AppelerMecanoFab } from "@/components/appeler-mecano-fab";
+import { Sidebar } from "@/components/sidebar";
 
 export default function DashboardLayout({
   children,
@@ -8,8 +8,8 @@ export default function DashboardLayout({
 }) {
   return (
     <>
-      {children}
-      <AppelerMecanoFab />
+      <Sidebar />
+      <div className="lg:pl-64">{children}</div>
       <BottomNav />
     </>
   );

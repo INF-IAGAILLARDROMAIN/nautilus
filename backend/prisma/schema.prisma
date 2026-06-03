@@ -1,0 +1,163 @@
+// =============================================================================
+// SCHÉMA PRISMA — Nautilus (back NestJS)
+// =============================================================================
+// 4 entités liées : Client → Bateau → Devis → OR
+// La Facture n'est PAS une entité — c'est un PDF généré quand un OR passe au
+// statut "FACTURE", à partir de l'OR + son Devis.
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum TypeClient {
+  PARTICULIER
+  PROFESSIONNEL
+}
+
+enum StatutDevis {
+  BROUILLON
+  ENVOYE
+  VALIDE   // → déclenche la création d'un OR
+  REFUSE
+}
+
+enum TypeOR {
+  ENTRETIEN
+  REPARATION
+  HIVERNAGE
+  DESHIVERNAGE
+  DEPANNAGE
+}
+
+enum UrgenceOR {
+  NORMAL
+  URGENT
+}
+
+enum StatutOR {
+  CREE
+  EN_COURS
+  TERMINE
+  FACTURE  // → génère le PDF Facture
+}
+
+// =============================================================================
+// MODÈLES
+// =============================================================================
+
+/// Un client (particulier ou professionnel) de l'atelier nautique.
+model Client {
+  id        String     @id @default(cuid())
+  nom       String
+  prenom    String
+  email     String?    @unique
+  telephone String?
+  adresse   String?
+  type      TypeClient @default(PARTICULIER)
+
+  bateaux   Bateau[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([nom, prenom])
+}
+
+/// Un bateau appartenant à un client. Un client peut avoir plusieurs bateaux.
+model Bateau {
+  id           String  @id @default(cuid())
+  marque       String
+  modele       String
+  /// Numéro de plaque du moteur hors-bord — identifiant terrain unique.
+  plaqueMoteur String  @unique
+  annee        Int?
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  devis Devis[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([marque, modele])
+}
+
+/// Devis = chiffrage proposé au client AVANT le travail.
+/// Quand un devis est VALIDÉ → un OR est créé automatiquement (côté service).
+model Devis {
+  id          String      @id @default(cuid())
+  /// Numéro de devis lisible : DEV-AAAA-XXXX (généré à la création).
+  numeroDevis String      @unique
+  description String?
+  totalHT     Decimal     @db.Decimal(10, 2) @default(0)
+  tauxTVA     Decimal     @db.Decimal(5, 2)  @default(20.00)
+  totalTTC    Decimal     @db.Decimal(10, 2) @default(0)
+  statut      StatutDevis @default(BROUILLON)
+
+  bateauId String
+  bateau   Bateau @relation(fields: [bateauId], references: [id], onDelete: Cascade)
+
+  lignes            LigneDevis[]
+  ordreReparation   OrdreReparation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bateauId])
+  @@index([statut])
+}
+
+/// Une ligne de devis (pièce ou main-d'œuvre).
+model LigneDevis {
+  id          String  @id @default(cuid())
+  description String
+  quantite    Decimal @db.Decimal(10, 2) @default(1)
+  prixUnitaireHT Decimal @db.Decimal(10, 2)
+  totalLigneHT   Decimal @db.Decimal(10, 2)
+
+  devisId String
+  devis   Devis  @relation(fields: [devisId], references: [id], onDelete: Cascade)
+
+  ordre Int @default(0) // pour conserver l'ordre d'affichage
+
+  @@index([devisId])
+}
+
+/// Ordre de Réparation = le travail effectivement à faire, créé une fois le devis validé.
+/// Quand l'OR passe au statut FACTURE → un PDF Facture est généré (mention "FACTURE" + numéroFacture).
+/// (Modèle nommé OrdreReparation car "OR" est un mot-clé réservé Prisma — opérateur logique.)
+model OrdreReparation {
+  id            String       @id @default(cuid())
+  description   String?
+  type          TypeOR       @default(REPARATION)
+  urgence       UrgenceOR    @default(NORMAL)
+  mecano        String?      // nom du mécano (champ libre — pas de table Mécano en MVP)
+  statut        StatutOR     @default(CREE)
+  /// Numéro de facture lisible : FAC-AAAA-XXXX (généré quand statut = FACTURE).
+  numeroFacture String?      @unique
+
+  devisId String @unique
+  devis   Devis  @relation(fields: [devisId], references: [id], onDelete: Restrict)
+
+  dateDebut DateTime?
+  dateFin   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ordre_reparation")
+  @@index([statut])
+  @@index([mecano])
+}

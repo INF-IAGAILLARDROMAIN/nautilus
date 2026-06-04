@@ -7,11 +7,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ClientsModule } from './clients/clients.module';
+import { BateauxModule } from './bateaux/bateaux.module';
+import { DevisModule } from './devis/devis.module';
+import { OrdreReparationModule } from './ordre-reparation/ordre-reparation.module';
 // Modules à brancher au fur et à mesure :
 // import { AuthModule } from './auth/auth.module';
-// import { BateauxModule } from './bateaux/bateaux.module';
-// import { DevisModule } from './devis/devis.module';
-// import { OrModule } from './or/or.module';
 // import { RechercheIaModule } from './recherche-ia/recherche-ia.module';
 // import { PdfModule } from './pdf/pdf.module';
 
@@ -31,9 +31,10 @@ import { ClientsModule } from './clients/clients.module';
     // Modules métier
     PrismaModule,
     ClientsModule,
+    BateauxModule,
+    OrdreReparationModule, // doit être déclaré AVANT DevisModule (DevisModule en dépend)
+    DevisModule,
     // AuthModule,
-    // BateauxModule,
-    // DevisModule,
     // OrModule,
     // RechercheIaModule,
     // PdfModule,

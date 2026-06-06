@@ -17,9 +17,9 @@ echo "→ Sophie : $SOPHIE_ID"
 
 echo ""
 echo "═══ 2. Création d'un bateau pour Sophie ═══"
-BATEAU=$(curl -s -X POST $API/bateaux -H "Content-Type: application/json" -d "{\"marque\":\"Yamaha\",\"modele\":\"F250\",\"plaqueMoteur\":\"YAM-$(date +%s)\",\"annee\":2024,\"clientId\":\"$SOPHIE_ID\"}")
+BATEAU=$(curl -s -X POST $API/bateaux -H "Content-Type: application/json" -d "{\"marque\":\"Beneteau\",\"modele\":\"Antares 7\",\"plaqueMoteur\":\"YAM-$(date +%s)\",\"annee\":2024,\"clientId\":\"$SOPHIE_ID\"}")
 BATEAU_ID=$(echo "$BATEAU" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
-echo "→ Bateau Yamaha F250 créé : $BATEAU_ID"
+echo "→ Bateau Beneteau Antares 7 (moteur Yamaha F250) créé : $BATEAU_ID"
 
 echo ""
 echo "═══ 3. Création d'un devis avec 3 lignes ═══"

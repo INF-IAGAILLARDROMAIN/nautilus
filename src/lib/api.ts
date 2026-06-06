@@ -26,7 +26,8 @@ export type Bateau = {
   clientId: string;
   createdAt: string;
   updatedAt: string;
-  client?: Client;
+  client?: Pick<Client, "id" | "nom" | "prenom">;
+  _count?: { devis: number };
 };
 
 export type Paginated<T> = {

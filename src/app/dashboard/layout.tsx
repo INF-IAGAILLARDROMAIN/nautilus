@@ -1,4 +1,3 @@
-import { BottomNav } from "@/components/bottom-nav";
 import { Sidebar } from "@/components/sidebar";
 
 export default function DashboardLayout({
@@ -10,7 +9,6 @@ export default function DashboardLayout({
     <>
       <Sidebar />
       <div className="lg:pl-64">{children}</div>
-      <BottomNav />
     </>
   );
 }

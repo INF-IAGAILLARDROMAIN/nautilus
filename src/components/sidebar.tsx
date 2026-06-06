@@ -2,33 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Anchor,
-  Home,
-  Receipt,
-  Wrench,
-  FileText,
-  Calendar,
-  Package,
-  Users,
-  BarChart3,
-  Settings,
-  ShieldCheck,
-  Snowflake,
-} from "lucide-react";
+import { Anchor, Home, Users, Ship } from "lucide-react";
 
+// Sidebar épurée — Option B
+// On ajoutera Devis / OR / Factures au fur et à mesure de leur création
+// (chacune branchée à l'API, pas de mocks).
 const navItems = [
   { href: "/dashboard", label: "Accueil", icon: Home },
-  { href: "/dashboard/devis", label: "Devis", icon: Receipt },
-  { href: "/dashboard/or", label: "Ordres de réparation", icon: Wrench },
-  { href: "/dashboard/factures", label: "Factures", icon: FileText },
-  { href: "/dashboard/planning", label: "Planning équipe", icon: Calendar },
-  { href: "/dashboard/stock", label: "Stock pièces", icon: Package },
-  { href: "/dashboard/equipe", label: "Équipe", icon: Users },
-  { href: "/dashboard/saisonnier", label: "Campagnes saison", icon: Snowflake },
-  { href: "/dashboard/garanties", label: "Garanties", icon: ShieldCheck },
-  { href: "/dashboard/stats", label: "Statistiques", icon: BarChart3 },
-  { href: "/dashboard/parametres", label: "Paramètres", icon: Settings },
+  { href: "/dashboard/clients", label: "Clients", icon: Users },
+  { href: "/dashboard/bateaux", label: "Bateaux", icon: Ship },
 ];
 
 export function Sidebar() {
@@ -39,13 +21,11 @@ export function Sidebar() {
       className="hidden lg:flex fixed inset-y-0 left-0 z-30 w-64 flex-col border-r bg-card"
       aria-label="Navigation principale"
     >
-      {/* Logo */}
       <div className="flex items-center gap-2 px-6 py-5 border-b bg-primary text-primary-foreground">
         <Anchor className="h-7 w-7" strokeWidth={2.5} />
         <span className="text-xl font-bold tracking-tight">Nautilus</span>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-1 px-3">
           {navItems.map((item) => {
@@ -75,9 +55,8 @@ export function Sidebar() {
         </ul>
       </nav>
 
-      {/* Footer sidebar */}
       <div className="border-t px-6 py-4 text-xs text-muted-foreground">
-        Chef d'atelier
+        Chef d&apos;atelier
       </div>
     </aside>
   );

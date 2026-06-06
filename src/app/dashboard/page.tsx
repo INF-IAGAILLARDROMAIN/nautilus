@@ -1,90 +1,39 @@
+"use client";
+
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import {
   Anchor,
-  Wrench,
-  Receipt,
-  FileText,
   Bell,
   Search,
-  ChevronRight,
+  Users,
+  Ship,
+  ArrowRight,
+  Loader2,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { api } from "@/lib/api";
 
-// Périmètre Option B — version examen :
-//   1 seul rôle (chef d'atelier) · 4 entités (Client → Bateau → Devis → OR) ·
-//   Facture = PDF généré quand OR passe au statut "facturé".
-
-type OrdreStatus =
-  | "CREE"
-  | "EN_COURS"
-  | "TERMINE"
-  | "FACTURE";
-
-const ordresJour: {
-  id: string;
-  bateau: string;
-  client: string;
-  type: string;
-  status: OrdreStatus;
-}[] = [
-  {
-    id: "OR-0142",
-    bateau: "Le Mistral",
-    client: "Dupont",
-    type: "Hivernage",
-    status: "EN_COURS",
-  },
-  {
-    id: "OR-0139",
-    bateau: "Petit Bleu",
-    client: "Petit",
-    type: "Entretien moteur",
-    status: "EN_COURS",
-  },
-  {
-    id: "OR-0140",
-    bateau: "L'Échappée",
-    client: "Bernard",
-    type: "Entretien moteur",
-    status: "TERMINE",
-  },
-];
-
-function statusBadge(status: OrdreStatus) {
-  switch (status) {
-    case "CREE":
-      return {
-        className: "bg-muted text-muted-foreground border-transparent",
-        label: "Créé",
-      };
-    case "EN_COURS":
-      return {
-        className: "bg-primary text-primary-foreground border-transparent",
-        label: "En cours",
-      };
-    case "TERMINE":
-      return {
-        className: "bg-chart-3 text-white border-transparent",
-        label: "Terminé",
-      };
-    case "FACTURE":
-      return {
-        className: "bg-chart-4 text-white border-transparent",
-        label: "Facturé",
-      };
-  }
-}
-
-// === Page ===
+// Dashboard épuré — Option B (1 rôle, périmètre examen)
+// Cœur examen = barre de recherche IA en langage naturel.
+// Les KPIs et listes récentes seront ajoutés au fur et à mesure de la création
+// des pages Devis / OR / Factures (toutes branchées API, plus aucun mock).
 
 export default function DashboardPage() {
+  const clientsQuery = useQuery({
+    queryKey: ["clients"],
+    queryFn: api.clients.list,
+  });
+  const bateauxQuery = useQuery({
+    queryKey: ["bateaux"],
+    queryFn: api.bateaux.list,
+  });
+
   return (
-    <div className="flex min-h-screen flex-col bg-background pb-24">
-      {/* Header sticky — identité Nautilus */}
+    <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-30 bg-primary text-primary-foreground shadow-md">
         <div className="flex items-center justify-between px-4 py-3 max-w-3xl mx-auto">
           <Link
@@ -116,130 +65,70 @@ export default function DashboardPage() {
       </header>
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-8">
-        {/* Barre de recherche — futur moteur de recherche IA en langage naturel */}
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
-          <Input
-            type="search"
-            placeholder="Demande en français : « bateau de Dupont », « OR en cours », « devis impayés »…"
-            className="pl-11 h-12 text-base"
-          />
-        </div>
-
-        {/* Actions rapides — création */}
+        {/* Cœur examen : barre de recherche IA en langage naturel */}
         <section>
-          <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
-            Créer
-          </h2>
-          <div className="grid grid-cols-2 gap-3">
-            <Link
-              href="/dashboard/clients/nouveau"
-              className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border-2 border-primary/30 hover:bg-primary/5 active:scale-95 transition-transform"
-            >
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white">
-                <Anchor className="h-5 w-5" strokeWidth={2.5} />
-              </div>
-              <span className="text-xs font-bold uppercase tracking-wide text-center leading-tight">
-                Nouveau<br />client
-              </span>
-            </Link>
-            <Link
-              href="/dashboard/devis/nouveau"
-              className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border-2 border-accent/30 hover:bg-accent/5 active:scale-95 transition-transform"
-            >
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-accent text-white">
-                <Receipt className="h-5 w-5" strokeWidth={2.5} />
-              </div>
-              <span className="text-xs font-bold uppercase tracking-wide text-center leading-tight">
-                Nouveau<br />devis
-              </span>
-            </Link>
+          <h1 className="text-2xl font-bold tracking-tight mb-1">
+            Bonjour, Romain 👋
+          </h1>
+          <p className="text-sm text-muted-foreground mb-4">
+            Pose ta question en français, l&apos;assistant interroge la base
+            pour toi.
+          </p>
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
+            <Input
+              type="search"
+              placeholder="« bateau de Martin », « OR en cours », « devis impayés »…"
+              className="pl-11 h-14 text-base"
+              disabled
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider font-bold text-muted-foreground bg-muted px-2 py-1 rounded">
+              Bientôt
+            </span>
           </div>
         </section>
 
-        {/* KPIs */}
-        <section className="grid grid-cols-3 gap-3">
-          <Link
-            href="/dashboard/devis"
-            className="rounded-xl bg-accent/10 border-2 border-accent/30 p-4 flex flex-col gap-1.5 active:scale-95 transition-transform hover:bg-accent/15"
-          >
-            <Receipt className="h-5 w-5 text-accent" strokeWidth={2.5} />
-            <div className="text-4xl font-bold tabular-nums leading-none text-accent">
-              8
-            </div>
-            <div className="text-[11px] uppercase tracking-wide font-bold text-accent leading-tight">
-              Devis attente
-            </div>
-          </Link>
-          <Link
-            href="/dashboard/or"
-            className="rounded-xl bg-primary/10 border-2 border-primary/30 p-4 flex flex-col gap-1.5 active:scale-95 transition-transform hover:bg-primary/15"
-          >
-            <Wrench className="h-5 w-5 text-primary" strokeWidth={2.5} />
-            <div className="text-4xl font-bold tabular-nums leading-none text-primary">
-              12
-            </div>
-            <div className="text-[11px] uppercase tracking-wide font-bold text-primary leading-tight">
-              OR en cours
-            </div>
-          </Link>
-          <Link
-            href="/dashboard/factures"
-            className="rounded-xl bg-chart-4/10 border-2 border-chart-4/30 p-4 flex flex-col gap-1.5 active:scale-95 transition-transform hover:bg-chart-4/15"
-          >
-            <FileText className="h-5 w-5 text-chart-4" strokeWidth={2.5} />
-            <div className="text-4xl font-bold tabular-nums leading-none text-chart-4">
-              6
-            </div>
-            <div className="text-[11px] uppercase tracking-wide font-bold text-chart-4 leading-tight">
-              Facturés
-            </div>
-          </Link>
-        </section>
-
-        {/* OR récents */}
+        {/* Carte unique Clients — entité racine du modèle métier
+            Bateau, Devis, OR, Facture sont accessibles DEPUIS le client.
+            La vue "tous les bateaux" reste dispo via la sidebar. */}
         <section>
-          <div className="flex items-end justify-between mb-3">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              OR récents · {ordresJour.length}
-            </h2>
-            <Link
-              href="/dashboard/or"
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              Tout voir
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {ordresJour.map((or) => {
-              const b = statusBadge(or.status);
-              return (
-                <button
-                  key={or.id}
-                  type="button"
-                  className="w-full flex items-center gap-3 p-4 rounded-xl bg-card border text-left active:scale-[0.99] transition-transform hover:bg-muted/50"
-                >
-                  <div className="min-w-0 flex-1 space-y-1.5">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-lg font-bold leading-tight">
-                        {or.bateau}
-                      </h3>
-                      <Badge className={`${b.className} text-[10px]`}>
-                        {b.label}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {or.type} · {or.client}
-                    </p>
-                    <p className="text-xs text-muted-foreground font-mono">
-                      {or.id}
-                    </p>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
-                </button>
-              );
-            })}
-          </div>
+          <Link
+            href="/dashboard/clients"
+            className="block rounded-2xl bg-card border-2 border-primary/30 p-6 hover:bg-primary/5 active:scale-[0.99] transition-transform"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                <Users className="h-6 w-6" strokeWidth={2.5} />
+              </div>
+              <ArrowRight className="h-5 w-5 text-muted-foreground" />
+            </div>
+
+            <div className="flex items-baseline gap-3 mb-2">
+              {clientsQuery.isLoading ? (
+                <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+              ) : (
+                <span className="text-5xl font-bold tabular-nums leading-none text-primary">
+                  {clientsQuery.data?.total ?? "—"}
+                </span>
+              )}
+              <span className="text-xl font-semibold text-muted-foreground">
+                {(clientsQuery.data?.total ?? 0) > 1 ? "clients" : "client"}
+              </span>
+            </div>
+
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Ship className="h-4 w-4" />
+              {bateauxQuery.isLoading
+                ? "Chargement des bateaux…"
+                : `${bateauxQuery.data?.total ?? 0} bateau${
+                    (bateauxQuery.data?.total ?? 0) > 1 ? "x" : ""
+                  } rattaché${(bateauxQuery.data?.total ?? 0) > 1 ? "s" : ""}`}
+            </p>
+
+            <p className="text-sm font-medium text-primary mt-4">
+              Voir tous les clients →
+            </p>
+          </Link>
         </section>
       </main>
     </div>

@@ -2,15 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Anchor, Home, Users, Ship } from "lucide-react";
+import {
+  Anchor,
+  Home,
+  Users,
+  Ship,
+  Receipt,
+  Wrench,
+  FileText,
+} from "lucide-react";
 
 // Sidebar épurée — Option B
-// On ajoutera Devis / OR / Factures au fur et à mesure de leur création
-// (chacune branchée à l'API, pas de mocks).
+// Toutes les pages sont branchées à l'API (plus aucun mock).
 const navItems = [
   { href: "/dashboard", label: "Accueil", icon: Home },
   { href: "/dashboard/clients", label: "Clients", icon: Users },
   { href: "/dashboard/bateaux", label: "Bateaux", icon: Ship },
+  { href: "/dashboard/devis", label: "Devis", icon: Receipt },
+  { href: "/dashboard/or", label: "Ordres de réparation", icon: Wrench },
+  { href: "/dashboard/factures", label: "Factures", icon: FileText },
 ];
 
 export function Sidebar() {

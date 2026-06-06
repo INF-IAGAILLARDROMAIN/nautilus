@@ -8,6 +8,9 @@ import {
   Search,
   Users,
   Ship,
+  Receipt,
+  Wrench,
+  FileText,
   ArrowRight,
   Loader2,
 } from "lucide-react";
@@ -30,6 +33,18 @@ export default function DashboardPage() {
   const bateauxQuery = useQuery({
     queryKey: ["bateaux"],
     queryFn: api.bateaux.list,
+  });
+  const devisQuery = useQuery({
+    queryKey: ["devis"],
+    queryFn: api.devis.list,
+  });
+  const orQuery = useQuery({
+    queryKey: ["or"],
+    queryFn: api.or.list,
+  });
+  const facturesQuery = useQuery({
+    queryKey: ["factures"],
+    queryFn: api.factures.list,
   });
 
   return (
@@ -130,7 +145,90 @@ export default function DashboardPage() {
             </p>
           </Link>
         </section>
+
+        {/* KPIs en temps réel — chiffres venus de la BDD via TanStack Query */}
+        <section className="space-y-3">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            En un coup d&apos;œil
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <KpiCard
+              href="/dashboard/bateaux"
+              label="Bateaux"
+              icon={Ship}
+              count={bateauxQuery.data?.total}
+              loading={bateauxQuery.isLoading}
+              accent="primary"
+            />
+            <KpiCard
+              href="/dashboard/devis"
+              label="Devis"
+              icon={Receipt}
+              count={devisQuery.data?.total}
+              loading={devisQuery.isLoading}
+              accent="accent"
+            />
+            <KpiCard
+              href="/dashboard/or"
+              label="OR"
+              icon={Wrench}
+              count={orQuery.data?.total}
+              loading={orQuery.isLoading}
+              accent="chart-3"
+            />
+            <KpiCard
+              href="/dashboard/factures"
+              label="Factures"
+              icon={FileText}
+              count={facturesQuery.data?.total}
+              loading={facturesQuery.isLoading}
+              accent="chart-4"
+            />
+          </div>
+        </section>
       </main>
     </div>
+  );
+}
+
+function KpiCard({
+  href,
+  label,
+  icon: Icon,
+  count,
+  loading,
+  accent,
+}: {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  count: number | undefined;
+  loading: boolean;
+  accent: "primary" | "accent" | "chart-3" | "chart-4";
+}) {
+  const accentClasses = {
+    primary: "bg-primary/10 border-primary/30 text-primary",
+    accent: "bg-accent/10 border-accent/30 text-accent",
+    "chart-3": "bg-chart-3/10 border-chart-3/30 text-chart-3",
+    "chart-4": "bg-chart-4/10 border-chart-4/30 text-chart-4",
+  }[accent];
+
+  return (
+    <Link
+      href={href}
+      className={`rounded-xl border-2 p-4 flex flex-col gap-1.5 active:scale-95 transition-transform ${accentClasses}`}
+    >
+      <Icon className="h-5 w-5" strokeWidth={2.5} />
+      {loading ? (
+        <Loader2 className="h-7 w-7 animate-spin" />
+      ) : (
+        <span className="text-3xl font-bold tabular-nums leading-none">
+          {count ?? "—"}
+        </span>
+      )}
+      <span className="text-[11px] uppercase tracking-wide font-bold leading-tight">
+        {label}
+      </span>
+    </Link>
   );
 }

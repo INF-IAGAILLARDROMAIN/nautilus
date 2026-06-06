@@ -30,6 +30,62 @@ export type Bateau = {
   _count?: { devis: number };
 };
 
+export type StatutDevis = "BROUILLON" | "ENVOYE" | "VALIDE" | "REFUSE";
+
+export type Devis = {
+  id: string;
+  numeroDevis: string;
+  description: string | null;
+  statut: StatutDevis;
+  totalHT: string;
+  totalTVA: string;
+  totalTTC: string;
+  bateauId: string;
+  createdAt: string;
+  updatedAt: string;
+  bateau?: {
+    id: string;
+    marque: string;
+    modele: string;
+    client?: Pick<Client, "id" | "nom" | "prenom">;
+  };
+  _count?: { lignes: number };
+};
+
+export type StatutOR = "CREE" | "EN_COURS" | "TERMINE" | "FACTURE";
+export type TypeOR =
+  | "ENTRETIEN"
+  | "REPARATION"
+  | "HIVERNAGE"
+  | "DESHIVERNAGE"
+  | "DEPANNAGE";
+export type UrgenceOR = "NORMAL" | "URGENT";
+
+export type OrdreReparation = {
+  id: string;
+  description: string | null;
+  type: TypeOR;
+  urgence: UrgenceOR;
+  mecano: string | null;
+  statut: StatutOR;
+  numeroFacture: string | null;
+  devisId: string;
+  dateDebut: string | null;
+  dateFin: string | null;
+  createdAt: string;
+  updatedAt: string;
+  devis?: {
+    id: string;
+    numeroDevis: string;
+    totalTTC: string;
+    bateau?: {
+      marque: string;
+      modele: string;
+      client?: { nom: string; prenom: string };
+    };
+  };
+};
+
 export type Paginated<T> = {
   data: T[];
   total: number;
@@ -58,5 +114,15 @@ export const api = {
   },
   bateaux: {
     list: () => request<Paginated<Bateau>>("/bateaux"),
+  },
+  devis: {
+    list: () => request<Paginated<Devis>>("/devis"),
+  },
+  or: {
+    list: () => request<Paginated<OrdreReparation>>("/or"),
+  },
+  factures: {
+    // Une facture = un OR au statut FACTURE.
+    list: () => request<Paginated<OrdreReparation>>("/or?statut=FACTURE"),
   },
 };

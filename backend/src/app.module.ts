@@ -6,12 +6,12 @@ import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './auth/auth.module';
 import { ClientsModule } from './clients/clients.module';
 import { BateauxModule } from './bateaux/bateaux.module';
 import { DevisModule } from './devis/devis.module';
 import { OrdreReparationModule } from './ordre-reparation/ordre-reparation.module';
 // Modules à brancher au fur et à mesure :
-// import { AuthModule } from './auth/auth.module';
 // import { RechercheIaModule } from './recherche-ia/recherche-ia.module';
 // import { PdfModule } from './pdf/pdf.module';
 
@@ -28,14 +28,16 @@ import { OrdreReparationModule } from './ordre-reparation/ordre-reparation.modul
       },
     ]),
 
+    // Auth — installe SupabaseJwtGuard globalement (toutes les routes
+    // sont protégées par défaut, exempter avec @Public())
+    AuthModule,
+
     // Modules métier
     PrismaModule,
     ClientsModule,
     BateauxModule,
     OrdreReparationModule, // doit être déclaré AVANT DevisModule (DevisModule en dépend)
     DevisModule,
-    // AuthModule,
-    // OrModule,
     // RechercheIaModule,
     // PdfModule,
   ],

@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LogoutButton } from "@/components/logout-button";
 import { api } from "@/lib/api";
 
 // Dashboard épuré — Option B (1 rôle, périmètre examen)
@@ -70,6 +71,7 @@ export default function DashboardPage() {
             <div className="text-primary-foreground [&_button]:text-primary-foreground [&_button]:hover:bg-primary-foreground/10 [&_button]:hover:text-primary-foreground">
               <ThemeToggle />
             </div>
+            <LogoutButton />
             <Avatar className="h-9 w-9 ring-2 ring-primary-foreground/40">
               <AvatarFallback className="bg-accent text-accent-foreground font-bold text-sm">
                 RG

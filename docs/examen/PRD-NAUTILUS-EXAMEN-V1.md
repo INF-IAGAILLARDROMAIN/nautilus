@@ -106,9 +106,9 @@ Choix arrêté le 01/06/2026, sur conseil de Fabien Leyrissoux (Lead dev INF-IA,
 - L'historique de chaque recherche (question + réponse + utilisateur + timestamp) est stocké en MongoDB
 - 5 cas d'usage minimum couverts (cf. jeu d'essai) :
   1. "Le bateau de Dupont" → fiche bateau + historique
-  2. "OR en cours" → liste filtrée par statut
-  3. "Devis impayés de mai" → liste filtrée par statut + période
-  4. "Quels moteurs Yamaha 250 chez moi ?" → recherche par marque/modèle
+  2. "OR en cours" → liste filtrée par statut (EN_COURS)
+  3. "Devis non validés de mai" → liste filtrée par statut (BROUILLON/ENVOYE/REFUSE) + période
+  4. "Quels moteurs Yamaha 250 chez moi ?" → recherche par marque/modèle de moteur
   5. Question hors-domaine → réponse polie + suggestions
 
 ### C. Génération PDF côté serveur
@@ -215,7 +215,7 @@ Choix arrêté le 01/06/2026, sur conseil de Fabien Leyrissoux (Lead dev INF-IA,
 - ❌ Envoi email automatique (en bonus si temps en S4 — sinon Romain peut envoyer manuellement le PDF en pièce jointe par son Gmail)
 - ❌ Multi-atelier / multi-tenant
 - ❌ Facturation comptable / export comptable
-- ❌ Tableau de bord BI avancé (un dashboard simple avec 3 compteurs suffit)
+- ❌ Tableau de bord BI avancé (le dashboard actuel = carte "Clients" mise en avant comme entité racine + grille 4 KPIs temps réel Bateaux/Devis/OR/Factures, branchés à l'API via TanStack Query)
 
 ---
 

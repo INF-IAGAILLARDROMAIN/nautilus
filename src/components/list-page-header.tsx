@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LogoutButton } from "@/components/logout-button";
 
 interface ListPageHeaderProps {
   title: string;
@@ -46,6 +47,7 @@ export function ListPageHeader({ title, subtitle, action }: ListPageHeaderProps)
             </Link>
           </Button>
         )}
+        <LogoutButton />
       </div>
     </header>
   );

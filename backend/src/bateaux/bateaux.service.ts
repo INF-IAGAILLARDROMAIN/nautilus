@@ -61,7 +61,8 @@ export class BateauxService {
         where,
         skip,
         take,
-        orderBy: { createdAt: 'desc' },
+        // Tri alphabétique par défaut (marque puis modèle) — comme un annuaire.
+        orderBy: [{ marque: 'asc' }, { modele: 'asc' }],
         include: {
           client: { select: { id: true, nom: true, prenom: true } },
           _count: { select: { devis: true } },

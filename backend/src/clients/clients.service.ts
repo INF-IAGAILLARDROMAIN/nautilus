@@ -34,7 +34,9 @@ export class ClientsService {
         where,
         skip,
         take,
-        orderBy: { createdAt: 'desc' },
+        // Tri alphabétique par défaut (nom puis prénom) — comme un annuaire métier.
+        // Cohérent avec la pratique des ERP type Infocob.
+        orderBy: [{ nom: 'asc' }, { prenom: 'asc' }],
         include: { _count: { select: { bateaux: true } } },
       }),
       this.prisma.client.count({ where }),

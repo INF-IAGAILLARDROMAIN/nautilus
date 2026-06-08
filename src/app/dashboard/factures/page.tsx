@@ -113,8 +113,10 @@ export default function FacturesListPage() {
                           <span className="text-muted-foreground">·</span>
                           <User className="h-3.5 w-3.5 text-muted-foreground" />
                           <span className="text-muted-foreground">
-                            {f.devis.bateau.client.prenom}{" "}
-                            {f.devis.bateau.client.nom}
+                            <span className="font-bold uppercase">
+                              {f.devis.bateau.client.nom}
+                            </span>{" "}
+                            {f.devis.bateau.client.prenom}
                           </span>
                         </>
                       )}

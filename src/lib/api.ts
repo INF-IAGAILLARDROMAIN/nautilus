@@ -126,10 +126,26 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+export type CreateClientInput = {
+  nom: string;
+  prenom: string;
+  email?: string | null;
+  telephone?: string | null;
+  adresse?: string | null;
+  ville?: string | null;
+  codePostal?: string | null;
+  notes?: string | null;
+};
+
 export const api = {
   clients: {
     list: () => request<Paginated<Client>>("/clients"),
     get: (id: string) => request<Client>(`/clients/${id}`),
+    create: (input: CreateClientInput) =>
+      request<Client>("/clients", {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
   },
   bateaux: {
     list: () => request<Paginated<Bateau>>("/bateaux"),

@@ -34,6 +34,21 @@ export class CreateClientDto {
   adresse?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  codePostal?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  ville?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  notes?: string;
+
+  @IsOptional()
   @IsEnum(TypeClient)
   type?: TypeClient;
 }

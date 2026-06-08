@@ -57,18 +57,21 @@ enum StatutOR {
 
 /// Un client (particulier ou professionnel) de l'atelier nautique.
 model Client {
-  id        String     @id @default(cuid())
-  nom       String
-  prenom    String
-  email     String?    @unique
-  telephone String?
-  adresse   String?
-  type      TypeClient @default(PARTICULIER)
+  id         String     @id @default(cuid())
+  nom        String
+  prenom     String
+  email      String?    @unique
+  telephone  String?
+  adresse    String?
+  codePostal String?    @db.VarChar(10)
+  ville      String?    @db.VarChar(100)
+  notes      String?    @db.Text
+  type       TypeClient @default(PARTICULIER)
 
-  bateaux   Bateau[]
+  bateaux    Bateau[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([nom, prenom])
 }

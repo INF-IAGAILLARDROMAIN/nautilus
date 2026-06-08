@@ -119,7 +119,10 @@ export default function DevisListPage() {
                           <>
                             <span className="text-muted-foreground">·</span>
                             <span className="text-muted-foreground">
-                              {d.bateau.client.prenom} {d.bateau.client.nom}
+                              <span className="font-bold uppercase">
+                                {d.bateau.client.nom}
+                              </span>{" "}
+                              {d.bateau.client.prenom}
                             </span>
                           </>
                         )}

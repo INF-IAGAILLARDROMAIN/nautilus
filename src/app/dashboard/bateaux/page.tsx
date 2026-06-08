@@ -84,7 +84,8 @@ export default function BateauxListPage() {
                   </div>
                   {b.client && (
                     <p className="text-sm font-medium">
-                      👤 {b.client.prenom} {b.client.nom}
+                      👤 <span className="font-bold uppercase">{b.client.nom}</span>{" "}
+                      {b.client.prenom}
                     </p>
                   )}
                   <div className="flex items-center gap-3 text-xs font-mono text-muted-foreground pt-1 flex-wrap">

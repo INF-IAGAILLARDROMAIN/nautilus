@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/components/query-provider";
 import "./globals.css";
@@ -41,6 +42,12 @@ export default function RootLayout({
           themes={["light", "dark"]}
         >
           <QueryProvider>{children}</QueryProvider>
+          <Toaster
+            position="top-center"
+            richColors
+            closeButton
+            duration={4000}
+          />
         </ThemeProvider>
       </body>
     </html>

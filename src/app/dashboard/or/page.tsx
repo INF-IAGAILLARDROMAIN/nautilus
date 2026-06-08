@@ -160,8 +160,10 @@ export default function OrListPage() {
                             <span className="text-muted-foreground">·</span>
                             <User className="h-3.5 w-3.5 text-muted-foreground" />
                             <span className="text-muted-foreground">
-                              {or.devis.bateau.client.prenom}{" "}
-                              {or.devis.bateau.client.nom}
+                              <span className="font-bold uppercase">
+                                {or.devis.bateau.client.nom}
+                              </span>{" "}
+                              {or.devis.bateau.client.prenom}
                             </span>
                           </>
                         )}

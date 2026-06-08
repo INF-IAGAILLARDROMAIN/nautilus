@@ -71,8 +71,13 @@ export default function ClientsListPage() {
                   <User className="h-5 w-5" strokeWidth={2.5} />
                 </div>
                 <div className="min-w-0 flex-1 space-y-1">
-                  <h3 className="text-lg font-bold leading-tight">
-                    {c.prenom} {c.nom}
+                  {/* Format NOM Prénom — convention française métier (Infocob, ERP),
+                      cohérent avec le tri alphabétique par nom */}
+                  <h3 className="text-lg leading-tight">
+                    <span className="font-bold uppercase tracking-wide">
+                      {c.nom}
+                    </span>{" "}
+                    <span className="font-medium">{c.prenom}</span>
                   </h3>
                   {(c.email || c.telephone) && (
                     <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">

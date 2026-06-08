@@ -6,22 +6,13 @@
 
 ---
 
-## ⚠️ STATUT AU 29/05/2026 — LIRE EN PREMIER
+## ✅ STATUT CONFIRMÉ — SESSION 29/06/2026
 
-> **La session de juin-juillet 2026 n'est plus jouable.** Le DP et le Dossier Projet devaient être déposés **avant le 1er mai 2026** ; cette date est dépassée et rien n'a été déposé.
->
-> **➡️ Report AUTOMATIQUE sur la session de NOVEMBRE-DÉCEMBRE 2026** (confirmé par l'IA Studi le 29/05 ; aucune démarche de report à faire). La convocation du 29/06/2026 est caduque.
+> **Session ferme : examen le 29/06/2026 à Villepinte (Bâtiment Rostand).**
+> Confirmation après échange avec le SRA (06/2026) : Romain EST inscrit pour la session de juin — **pas de report sur nov-déc**.
+> Convocation valide. Toutes les dates ci-dessous sont à jour.
 
-**Ce qui en découle (corrige le reste du document) :**
-- **Toutes les dates de juin** mentionnées plus bas sont **CADUQUES**. La cible est désormais nov-déc 2026 (date exacte à confirmer auprès du SRA).
-- 🔴 **Gap d'accès plateforme** : l'accès Studi est garanti **jusqu'au 1er octobre 2026** seulement, or la session est en nov-déc. Les dépôts se font via la plateforme → il faut **déposer avant le 1er oct** OU obtenir une **prolongation d'accès** (question au SRA).
-- 🟠 **Risque financement CPF** : le report peut dépasser la période contractuelle (fin 29/05/2026) → vérifier le maintien des droits auprès de la Caisse des Dépôts + SRA. N° dossier CPF : **391388982280**. Contact CPF Studi : **info-cpf@studi.fr** / 01 74 888 555.
-
-**Actions admin restantes :**
-1. Écrire au **SRA Studi** : date exacte nov-déc + ECF acquis ? + frais ? + accord financeur ? + prolongation accès plateforme (gap 1er oct).
-2. Écrire à la **Caisse des Dépôts** (moncompteformation.gouv.fr) : impact du report sur le financement CPF.
-
-**Stratégie livrables retenue (29/05) :**
+**Stratégie livrables retenue :**
 - **Oral / Dossier Projet** : **Nautilus** uniquement.
 - **DP (book)** : vrais clients → **Winaxion** (front+back, NestJS+Prisma) + **Kosmos** ou **ING+** (front). Réserves : Nautilus (back), Vite & Gourmand. ⚠️ La grille validée portant sur Nautilus/RANKIA, le nouveau choix doit être **re-validé** par le formateur (forum DP).
 
@@ -36,9 +27,9 @@
 | Organisme de formation | Studi (Galileo Global Education) |
 | Candidat | Romain GAILLARD — ID apprenant 512363 |
 | Modalité d'accès | Parcours de formation (financé CPF — n° dossier 391388982280) |
-| Session visée | **Novembre-Décembre 2026** (report auto ; ex juin-juillet 2026 manquée) |
-| Date d'examen | À confirmer auprès du SRA (la convocation du 29/06/2026 est caduque) |
-| Lieu | Centre d'examen à confirmer (était Bâtiment Rostand, Villepinte 93420) |
+| Session visée | **Juin-juillet 2026** (session ferme) |
+| Date d'examen | **29/06/2026** |
+| Lieu | **Bâtiment Rostand, Villepinte 93420** |
 | Jury | 2 professionnels (1 développeur + 1 manager/lead) — DREETS |
 | Format examen (présentiel) | 4 épreuves : présentation projet **35 min** + entretien technique **40 min** + questionnaire professionnel **30 min** + entretien final **15 min** |
 
@@ -395,7 +386,7 @@ Espace dédié sur la plateforme Studi, à déposer **après** le dépôt final 
 
 ---
 
-# 3. Le jour J — session nov-déc 2026 (date exacte à confirmer SRA)
+# 3. Le jour J — 29/06/2026, Villepinte
 
 ## 3.1 Déroulé (4 épreuves en présentiel, ~2h)
 
@@ -424,23 +415,18 @@ Espace dédié sur la plateforme Studi, à déposer **après** le dépôt final 
 
 ---
 
-# 4. Calendrier (cible : session nov-déc 2026)
-
-> Dates exactes à confirmer auprès du SRA. Contrainte forte : **accès plateforme jusqu'au 1er octobre 2026** → viser des dépôts avant cette date ou demander une prolongation.
+# 4. Calendrier — Session du 29/06/2026
 
 | Échéance | Action | Statut |
 |---|---|---|
-| Immédiat | Écrire au SRA (date exacte + ECF acquis + frais + accès plateforme) | ⏳ |
-| Immédiat | Écrire à la Caisse des Dépôts (impact CPF) | ⏳ |
-| Été 2026 | Finir Nautilus (front + back + scan plaque + déploiement) | ⏳ |
-| Été 2026 | Rédiger Dossier Projet + DP (Winaxion + Kosmos/ING+) | ⏳ |
-| Été 2026 | Re-valider la nouvelle grille DP avec le formateur (forum DP) | ⏳ |
-| Avant 1er oct 2026 | Dépôts intermédiaires (retours formateur, ~10 j ouvrés/retour) | ⏳ |
-| Avant 1er oct 2026 (ou date SRA) | **Dépôts finaux** : DP + Dossier Projet + diaporama | 🔴 |
-| Avant l'oral | Imprimer/relier : DP ×2, Dossier Projet ×2 + télécharger livret ECF | ⏳ |
-| Avant l'oral | Oral d'entraînement avec formateur (réservable après dépôt Dossier Projet) | ⏳ |
-| Avant l'oral | Réviser le questionnaire professionnel + l'entretien technique | ⏳ |
-| **Nov-déc 2026** | 🎯 **Examen** (4 épreuves) | 🔴 |
+| S1 (02-08/06) | BDD + Auth + CRUD Nautilus | ✅ Quasi terminée |
+| S2 (09-15/06) | Moteur IA + génération PDF + déploiement Vercel/Railway | ⏳ |
+| S3 (16-22/06) | Rédaction Dossier Projet + DP (Winaxion + Kosmos/ING+) + 1er dépôt | ⏳ |
+| S4 (23-28/06) | Diaporama + répétitions orales + dépôts finaux | 🔴 |
+| ~26/06 | **Dépôt final Dossier Projet** | 🔴 |
+| ~27/06 | **Dépôt diaporama** | 🔴 |
+| 28/06 | Imprimer/relier : DP ×2, Dossier Projet ×2 + télécharger livret ECF | 🔴 |
+| **29/06/2026** | 🎯 **Examen à Villepinte (4 épreuves, ~2h)** | 🔴 |
 
 ---
 

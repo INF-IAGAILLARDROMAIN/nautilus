@@ -175,20 +175,23 @@ export class OrdreReparationService {
   /**
    * Génère un numéro de facture lisible : FAC-AAAA-XXXX
    * (séquentiel par année sur les OR au statut FACTURE).
+   *
+   * On filtre directement sur le préfixe du `numeroFacture` (FAC-AAAA-)
+   * plutôt que sur `updatedAt` : un OR ancien re-modifié garde son année
+   * de facturation d'origine, on ne doit pas le recompter dans la séquence
+   * de l'année courante.
    */
   private async genererNumeroFacture(): Promise<string> {
     const annee = new Date().getFullYear();
-    const debutAnnee = new Date(annee, 0, 1);
-    const finAnnee = new Date(annee + 1, 0, 1);
+    const prefix = `FAC-${annee}-`;
 
     const count = await this.prisma.ordreReparation.count({
       where: {
-        numeroFacture: { not: null },
-        updatedAt: { gte: debutAnnee, lt: finAnnee },
+        numeroFacture: { startsWith: prefix },
       },
     });
 
     const sequence = String(count + 1).padStart(4, '0');
-    return `FAC-${annee}-${sequence}`;
+    return `${prefix}${sequence}`;
   }
 }

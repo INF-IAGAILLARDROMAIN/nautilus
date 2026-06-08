@@ -69,18 +69,52 @@ export type Devis = {
   description: string | null;
   statut: StatutDevis;
   totalHT: string;
-  totalTVA: string;
+  tauxTVA: string;
   totalTTC: string;
-  bateauId: string;
+  dateValidite: string | null;
+  modalitesPaiement: string | null;
+  /** Client destinataire — toujours présent. */
+  clientId: string;
+  /** Bateau concerné — null si devis pré-vente / sans bateau. */
+  bateauId: string | null;
   createdAt: string;
   updatedAt: string;
+  client?: Pick<Client, "id" | "nom" | "prenom">;
   bateau?: {
     id: string;
+    nom: string | null;
     marque: string;
     modele: string;
     client?: Pick<Client, "id" | "nom" | "prenom">;
-  };
+  } | null;
+  /** OR créé automatiquement à la validation du devis. */
+  ordreReparation?: { id: string; statut: string } | null;
   _count?: { lignes: number };
+};
+
+export type DevisLigne = {
+  id: string;
+  description: string;
+  quantite: string;
+  prixUnitaireHT: string;
+  totalLigneHT: string;
+  ordre: number;
+};
+
+export type CreateDevisLigneInput = {
+  description: string;
+  quantite: number;
+  prixUnitaireHT: number;
+};
+
+export type CreateDevisInput = {
+  clientId: string;
+  bateauId?: string | null;
+  description?: string | null;
+  tauxTVA?: number;
+  dateValidite?: string | null;
+  modalitesPaiement?: string | null;
+  lignes: CreateDevisLigneInput[];
 };
 
 export type StatutOR = "CREE" | "EN_COURS" | "TERMINE" | "FACTURE";
@@ -190,9 +224,31 @@ export const api = {
   },
   devis: {
     list: () => request<Paginated<Devis>>("/devis"),
+    get: (id: string) => request<Devis & { lignes: DevisLigne[] }>(`/devis/${id}`),
+    create: (input: CreateDevisInput) =>
+      request<Devis>("/devis", {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
+    updateStatut: (id: string, statut: StatutDevis) =>
+      request<Devis>(`/devis/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ statut }),
+      }),
   },
   or: {
     list: () => request<Paginated<OrdreReparation>>("/or"),
+    get: (id: string) => request<OrdreReparation>(`/or/${id}`),
+    updateStatut: (id: string, statut: StatutOR) =>
+      request<OrdreReparation>(`/or/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ statut }),
+      }),
+    assignMecano: (id: string, mecano: string | null) =>
+      request<OrdreReparation>(`/or/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ mecano }),
+      }),
   },
   factures: {
     // Une facture = un OR au statut FACTURE.

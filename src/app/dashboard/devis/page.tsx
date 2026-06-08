@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Receipt, Loader2, Anchor } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -95,9 +96,9 @@ export default function DevisListPage() {
             {data.data.map((d: Devis) => {
               const b = statutBadge(d.statut);
               return (
-                <button
+                <Link
                   key={d.id}
-                  type="button"
+                  href={`/dashboard/devis/${d.id}`}
                   className="w-full flex items-start gap-3 p-4 rounded-xl bg-card border text-left active:scale-[0.99] transition-transform hover:bg-muted/30"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-accent text-white">
@@ -147,7 +148,7 @@ export default function DevisListPage() {
                     </div>
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0 mt-1" />
-                </button>
+                </Link>
               );
             })}
           </div>

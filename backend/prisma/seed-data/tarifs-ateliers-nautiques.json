@@ -1,0 +1,132 @@
+{
+  "_note": "Référentiel scrapé le 2026-06-08 : tarifs constructeurs (Mercury Service Excellence + Yamaha Service Support) + analyse de 7 ateliers nautiques français qui proposent devis en ligne. À utiliser pour : (1) templates de forfaits dans le formulaire Devis V1+, (2) contexte de l'agent IA en S2, (3) inspiration UX (simulateur, upload photo, forfaits Essentiel/Premium).",
+  "_source_scraping": "Agent général-purpose lancé le 2026-06-08, 49k tokens, 20 tool uses, 200s.",
+  "tarifs_constructeurs": {
+    "mercury_service_excellence": {
+      "principe": "Prix publics conseillés FIXES identiques chez tous les concessionnaires Mercury agréés en France. Programme lancé 2021, reconduit chaque année.",
+      "pdf_officiel": "https://www.mercurymarine.com/content/dam/mercury-marine/emea-assets/frfr/landing-pages/service-excellence/Tarif%20Public%20conseill%C3%A9%20Entretien%20HB%202025-2026%20(Oct%202025).pdf.coredownload.inline.pdf/",
+      "_note_pdf": "PDF officiel non extractible directement (WebFetch bloqué). Fourchettes ci-dessous reconstituées par sources secondaires (Argus du Bateau, ActuNautique, Distrimer).",
+      "tranches_puissance": ["2.5-30 CV (portable)", "30-60 CV (FourStroke)", "60-115 CV", "150-200 CV", "225-300 CV", "350-400R (Verado/Racing)"],
+      "prestations_couvertes": [
+        "Entretien annuel / 100h (vidange, filtres huile, séparateur, bougies, anodes, graissage, contrôle 25 points)",
+        "Entretien 300h (idem 100h + courroie distribution, thermostat, turbine pompe eau, soupapes)",
+        "Hivernage moteur (rinçage, stabilisateur, brumisation cylindres, vidange embase, stockage)",
+        "Déshivernage / remise en service",
+        "Diagnostic électronique CDS G3",
+        "Mise à jour calculateur"
+      ],
+      "fourchettes_entretien_100h_ttc": {
+        "2.5-30 CV": "180-320 €",
+        "30-60 CV": "320-480 €",
+        "60-115 CV": "480-680 €",
+        "150-200 CV": "680-950 €",
+        "225-300 CV": "950-1300 €",
+        "350-400R": "1300-1800 €"
+      },
+      "fourchette_hivernage_seul_ttc": "150-350 € selon puissance",
+      "fourchette_entretien_300h": "1.5x à 2x le tarif 100h selon puissance",
+      "bonus_garantie": "Extension GRATUITE jusqu'à 5 ans depuis la date d'achat si TOUS les entretiens sont réalisés chez un agent Mercury agréé selon préconisations constructeur."
+    },
+    "yamaha_service_support": {
+      "url_landing": "https://www.yamaha-motor.eu/fr/fr/service-support",
+      "url_forfaits_hb": "https://www.yamaha-motor.eu/fr/fr/service-support/maintenance-repair/forfaits-d-entretien/forfaits-entretien-hors-bord/",
+      "url_kits_maintenance": "https://www.yamaha-motor.eu/fr/fr/marine-engines/kits-maintenance/",
+      "principe": "Forfaits TTC max conseillés (main d'œuvre + pièces d'origine + lubrifiants). Cycle : tous les ans OU 100h (1ère échéance). Programmes structurés par 100h / 300h / 500h / 1000h.",
+      "prestations_standardisees": [
+        "1ère révision (20h ou après 1 mois)",
+        "Forfait entretien annuel / 100h",
+        "Forfait entretien 300h (gros entretien)",
+        "Forfait entretien 500h",
+        "Forfait entretien 1000h",
+        "Hivernage moteur (rinçage circuit eau, vidange embase, brumisation, stabilisateur)",
+        "Déshivernage / mise en route printemps",
+        "Diagnostic YDIS (Yamaha Diagnostic System)",
+        "Kits Maintenance 100h / 300h (lancés novembre 2024)"
+      ],
+      "fourchettes_entretien_100h_ttc": {
+        "F2.5-F25": "150-280 €",
+        "F40-F60": "300-450 €",
+        "F70-F100": "450-600 €",
+        "F115-F200": "600-900 €",
+        "F225-F300": "900-1300 €",
+        "F350-F425 XTO": "1300-1900 €"
+      },
+      "bonnes_pratiques_metier": [
+        "Vérifier niveau d'huile avant chaque sortie",
+        "Rincer circuit d'eau à l'eau douce après chaque navigation en mer (priorité #1 anti-corrosion)",
+        "Anodes : contrôle annuel obligatoire, remplacement si usure > 50%",
+        "Turbine pompe à eau : remplacement préventif 300h ou 3 ans",
+        "Bougies + filtres : à 100h",
+        "Huile embase : contrôle annuel (eau dans huile = joint spi à remplacer)",
+        "Stabilisateur carburant si moteur stocké > 1 mois (E10 instable)",
+        "Hivernage obligatoire si stockage > 2 mois"
+      ]
+    }
+  },
+  "ateliers_etudies": [
+    {
+      "nom": "Atelier du Bateau",
+      "ville": "Annecy (Saint-Jorioz)",
+      "site_web": "https://www.atelier-bateau.fr/nos-tarifs/",
+      "force": "Tarifs TTC publiés en clair = transparence forte",
+      "tarifs_hivernage_publies": {
+        "HB 4T < 60 CV": "520 € TTC",
+        "HB 4T > 60 CV": "600 € TTC",
+        "HB 2T < 60 CV": "390 € TTC",
+        "HB 2T > 60 CV": "490 € TTC",
+        "HB < 20 CV": "290 € TTC"
+      },
+      "inclus": "Vidanges, filtres, graissage, batterie stockée, nettoyage compartiment ou tête moteur, démarrage printemps + inspection générale, stabilisateur",
+      "exclu": "Pièces d'usure et réparations (turbine, courroie, soufflets, bougies)",
+      "depannage_local": "130 € TTC autour Annecy"
+    },
+    {
+      "nom": "Mecano-Nautique",
+      "ville": "Nice (06)",
+      "site_web": "https://www.mecano-nautique.com/services/tarifs",
+      "force": "Système de NIVEAUX (Essentiel/Premium) × GAMMES (≤60CV / >60CV) + étoiles ★",
+      "modele_forfaits": {
+        "essentiel": "Vidanges, filtration complète, graissage, anodes (★★)",
+        "premium": "Essentiel + turbine, bougies, additif injecteurs, rinçage STOP SALT, contrôle 25 points (★★★★★)",
+        "essentiel_grand": "Liquides HP, filtration, anti-corrosion (★★★)",
+        "premium_grand": "Essentiel grand + diagnostic électronique, contrôle tension courroie, traitement injection HP, rinçage STOP SALT, contrôle 25 points (★★★★★★)"
+      },
+      "delais": "Devis express 24h annoncé"
+    },
+    {
+      "nom": "Méca Marine 33",
+      "ville": "Bordeaux / Gironde",
+      "site_web": "https://www.mecamarine33.fr/tarifs/",
+      "force": "Spécialiste INTERVENTION À DOMICILE avec forfait déplacement saisonnier (sept-mai)"
+    },
+    {
+      "nom": "Ragonot Marine",
+      "ville": "La Rochelle / Île de Ré",
+      "site_web": "https://www.ragonot-marine.com/demande-de-devis/",
+      "force": "Formulaire MINIMALISTE 5 champs (lead capture) — Nautilus doit faire mieux : pré-qualification métier"
+    },
+    {
+      "nom": "Atelier 168",
+      "ville": "Paris / Île-de-France",
+      "site_web": "https://atelier168.fr/devis-en-ligne/",
+      "force": "Upload PHOTO dans le formulaire — à intégrer en V2 Nautilus (photo plaque moteur, photo zone abîmée)"
+    },
+    {
+      "nom": "Atelier du Nautisme",
+      "ville": "Var / PACA",
+      "site_web": "https://atelierdunautisme.com/contact-devis.html",
+      "force": "SIMULATEUR en ligne carénage (calcul auto selon surface coque). Inspiration pour Nautilus V2."
+    },
+    {
+      "nom": "Dépan'Nautic",
+      "ville": "Larmor-Baden / Vannes / Golfe Morbihan",
+      "site_web": "https://www.depan-nautic.com/tarifs/",
+      "force": "Concessionnaire Yamaha agréé, intervention atelier OU domicile OU port. Station lavage éco-responsable."
+    }
+  ],
+  "enseignements_pour_nautilus": [
+    "1. STRUCTURE TARIFAIRE STANDARDISÉE PAR PUISSANCE × TYPE 2T/4T. Le formulaire doit DEMANDER puissance + type 2T/4T en premier, puis pré-calculer / pré-sélectionner les forfaits applicables. Grille en BDD paramétrable (puissance × prestation × marque).",
+    "2. DUO 'FORFAIT ESSENTIEL / FORFAIT PREMIUM' = STANDARD MARCHÉ. Préremplir 3 templates de devis par défaut au lieu de tout retaper. L'agent IA (S2) pourra suggérer le forfait approprié selon les heures du moteur et l'historique.",
+    "3. DIFFÉRENCIATION NAUTILUS = photo plaque + historique des interventions + simulateur instantané + recommandation IA. Le combo gagnant pour transformer le formulaire en outil qui fait gagner du temps."
+  ]
+}

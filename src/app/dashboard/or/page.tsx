@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Wrench, Loader2, Anchor, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -126,9 +127,9 @@ export default function OrListPage() {
               const s = statutBadge(or.statut);
               const u = urgenceBadge(or.urgence);
               return (
-                <button
+                <Link
                   key={or.id}
-                  type="button"
+                  href={`/dashboard/or/${or.id}`}
                   className="w-full flex items-start gap-3 p-4 rounded-xl bg-card border text-left active:scale-[0.99] transition-transform hover:bg-muted/30"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary text-white">
@@ -201,7 +202,7 @@ export default function OrListPage() {
                     )}
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0 mt-1" />
-                </button>
+                </Link>
               );
             })}
           </div>

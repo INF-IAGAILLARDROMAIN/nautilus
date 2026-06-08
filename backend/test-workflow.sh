@@ -90,6 +90,7 @@ echo "→ Bateau Beneteau Antares 7 (moteur Yamaha F250) créé : $BATEAU_ID"
 echo ""
 echo "═══ 3. Création d'un devis avec 3 lignes ═══"
 DEVIS=$(curl -s -X POST $API/devis -H "$AUTH" -H "Content-Type: application/json" -d "{
+  \"clientId\":\"$SOPHIE_ID\",
   \"bateauId\":\"$BATEAU_ID\",
   \"description\":\"Entretien 100h\",
   \"lignes\":[

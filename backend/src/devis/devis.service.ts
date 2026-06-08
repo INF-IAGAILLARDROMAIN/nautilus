@@ -24,12 +24,28 @@ export class DevisService {
   // -------------------------------------------------------------------------
 
   async create(dto: CreateDevisDto): Promise<Devis> {
-    // Vérifie que le bateau existe
-    const bateau = await this.prisma.bateau.findUnique({
-      where: { id: dto.bateauId },
+    // Vérifie que le client existe (obligatoire — un devis a toujours un client).
+    const client = await this.prisma.client.findUnique({
+      where: { id: dto.clientId },
     });
-    if (!bateau) {
-      throw new BadRequestException(`Bateau ${dto.bateauId} introuvable`);
+    if (!client) {
+      throw new BadRequestException(`Client ${dto.clientId} introuvable`);
+    }
+
+    // Si bateau fourni : vérifie qu'il existe ET qu'il appartient bien au client.
+    // Bateau null = devis pré-vente / accessoires / sans bateau enregistré.
+    if (dto.bateauId) {
+      const bateau = await this.prisma.bateau.findUnique({
+        where: { id: dto.bateauId },
+      });
+      if (!bateau) {
+        throw new BadRequestException(`Bateau ${dto.bateauId} introuvable`);
+      }
+      if (bateau.clientId !== dto.clientId) {
+        throw new BadRequestException(
+          `Le bateau sélectionné n'appartient pas à ce client.`,
+        );
+      }
     }
 
     const tauxTVA = dto.tauxTVA ?? 20;
@@ -40,10 +56,13 @@ export class DevisService {
       data: {
         numeroDevis,
         description: dto.description ?? null,
-        bateauId: dto.bateauId,
+        clientId: dto.clientId,
+        bateauId: dto.bateauId ?? null,
         tauxTVA,
         totalHT,
         totalTTC,
+        dateValidite: dto.dateValidite ? new Date(dto.dateValidite) : null,
+        modalitesPaiement: dto.modalitesPaiement ?? null,
         lignes: {
           create: dto.lignes.map((l, index) => ({
             description: l.description,
@@ -82,9 +101,12 @@ export class DevisService {
         take,
         orderBy: { createdAt: 'desc' },
         include: {
+          // Client direct (utile pour les devis sans bateau — cas pré-vente)
+          client: { select: { id: true, nom: true, prenom: true } },
           bateau: {
             select: {
               id: true,
+              nom: true,
               marque: true,
               modele: true,
               client: { select: { id: true, nom: true, prenom: true } },
@@ -103,6 +125,7 @@ export class DevisService {
     const devis = await this.prisma.devis.findUnique({
       where: { id },
       include: {
+        client: true,
         bateau: { include: { client: true } },
         lignes: { orderBy: { ordre: 'asc' } },
         ordreReparation: true,

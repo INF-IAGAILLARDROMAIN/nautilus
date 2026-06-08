@@ -80,6 +80,9 @@ model Client {
   type       TypeClient @default(PARTICULIER)
 
   bateaux    Bateau[]
+  /// Devis liés au client (relation directe, indépendamment du bateau).
+  /// Un devis peut concerner un bateau précis OU être pré-vente / sans bateau.
+  devis      Devis[]
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -146,8 +149,24 @@ model Devis {
   totalTTC    Decimal     @db.Decimal(10, 2) @default(0)
   statut      StatutDevis @default(BROUILLON)
 
-  bateauId String
-  bateau   Bateau @relation(fields: [bateauId], references: [id], onDelete: Cascade)
+  /// Date jusqu'à laquelle le devis est valable (mention légale française).
+  dateValidite DateTime?
+
+  /// Modalités de paiement (texte libre).
+  modalitesPaiement String? @db.Text
+
+  /// Client destinataire du devis — OBLIGATOIRE.
+  /// Tous les devis ont un client (entretien, réparation, pré-vente, accessoires…).
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  /// Bateau concerné par le devis — facultatif.
+  /// Null = devis pré-vente (achat bateau / moteur), devis pour pièces génériques,
+  /// ou devis pour client sans bateau encore enregistré.
+  /// Si renseigné, la validation du devis déclenche la création d'un OR.
+  /// Si null, le statut VALIDE est terminal (pas d'OR auto).
+  bateauId String?
+  bateau   Bateau? @relation(fields: [bateauId], references: [id], onDelete: SetNull)
 
   lignes            LigneDevis[]
   ordreReparation   OrdreReparation?
@@ -155,6 +174,7 @@ model Devis {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([clientId])
   @@index([bateauId])
   @@index([statut])
 }

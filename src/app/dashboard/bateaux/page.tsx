@@ -74,7 +74,18 @@ export default function BateauxListPage() {
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-start gap-2 justify-between">
                     <h3 className="text-lg font-bold leading-tight">
-                      {b.marque} {b.modele}
+                      {b.nom ? (
+                        <>
+                          <span>{b.nom}</span>
+                          <span className="text-sm font-normal text-muted-foreground ml-1">
+                            · {b.marque} {b.modele}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          {b.marque} {b.modele}
+                        </>
+                      )}
                     </h3>
                     {b.annee && (
                       <Badge variant="outline" className="text-[10px] shrink-0">
@@ -88,10 +99,22 @@ export default function BateauxListPage() {
                       {b.client.prenom}
                     </p>
                   )}
-                  <div className="flex items-center gap-3 text-xs font-mono text-muted-foreground pt-1 flex-wrap">
-                    <span>🔧 {b.plaqueMoteur}</span>
+                  {(b.marqueMoteur || b.modeleMoteur || b.puissanceCV) && (
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-semibold">Moteur :</span>{" "}
+                      {b.marqueMoteur ?? "?"} {b.modeleMoteur ?? ""}
+                      {b.puissanceCV ? ` · ${b.puissanceCV} CV` : ""}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1 flex-wrap">
+                    {b.plaqueMoteur && (
+                      <span>
+                        <span className="font-semibold">Plaque :</span>{" "}
+                        <span className="font-mono">{b.plaqueMoteur}</span>
+                      </span>
+                    )}
                     {b._count && b._count.devis > 0 && (
-                      <span className="flex items-center gap-1 text-foreground font-sans">
+                      <span className="flex items-center gap-1 text-foreground">
                         <FileText className="h-3 w-3" />
                         {b._count.devis} devis
                       </span>

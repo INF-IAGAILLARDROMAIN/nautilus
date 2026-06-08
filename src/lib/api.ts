@@ -29,14 +29,31 @@ export type Client = {
   updatedAt: string;
 };
 
+export type TypeCoque =
+  | "STRATIFIE"
+  | "ALUMINIUM"
+  | "POLYETHYLENE"
+  | "SEMI_RIGIDE"
+  | "PNEUMATIQUE"
+  | "BOIS"
+  | "ACIER"
+  | "AUTRE";
+
 export type Bateau = {
   id: string;
+  nom: string | null;
   marque: string;
   modele: string;
-  plaqueMoteur: string;
+  typeCoque: TypeCoque;
+  immatriculation: string | null;
   annee: number | null;
-  type: string | null;
   notes: string | null;
+  // Motorisation (V1 : 1 moteur par bateau, V2 = entité Moteur séparée)
+  marqueMoteur: string | null;
+  modeleMoteur: string | null;
+  plaqueMoteur: string | null;
+  puissanceCV: number | null;
+  helice: string | null;
   clientId: string;
   createdAt: string;
   updatedAt: string;
@@ -126,6 +143,22 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+export type CreateBateauInput = {
+  nom?: string | null;
+  marque: string;
+  modele: string;
+  typeCoque?: TypeCoque;
+  immatriculation?: string | null;
+  annee?: number | null;
+  notes?: string | null;
+  marqueMoteur?: string | null;
+  modeleMoteur?: string | null;
+  plaqueMoteur?: string | null;
+  puissanceCV?: number | null;
+  helice?: string | null;
+  clientId: string;
+};
+
 export type CreateClientInput = {
   nom: string;
   prenom: string;
@@ -149,6 +182,11 @@ export const api = {
   },
   bateaux: {
     list: () => request<Paginated<Bateau>>("/bateaux"),
+    create: (input: CreateBateauInput) =>
+      request<Bateau>("/bateaux", {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
   },
   devis: {
     list: () => request<Paginated<Devis>>("/devis"),

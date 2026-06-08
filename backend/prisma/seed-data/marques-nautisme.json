@@ -1,0 +1,187 @@
+{
+  "_note": "Référentiel métier scrappé le 2026-06-08 par recherche web (32 bateaux + 18 moteurs filtrés marché français). À utiliser plus tard pour : (1) seed BDD du référentiel MarqueBateau/MarqueMoteur, (2) contexte métier injecté dans le prompt système de l'agent IA Nautilus. Sources : Wikipédia FR/EN, bateaux.com, ActuNautique, sites constructeurs officiels, lagerholm.com.",
+  "bateaux": [
+    { "marque": "Bénéteau", "pays": "France", "types": ["open", "pêche-promenade", "voilier"], "modeles_phares": ["Antares 7", "Flyer 6 SUNdeck", "Barracuda 7", "First 24"], "actif": true, "annee_fondation": 1884 },
+    { "marque": "Jeanneau", "pays": "France", "types": ["pêche-promenade", "open", "voilier"], "modeles_phares": ["Merry Fisher 695", "Cap Camarat 7.5", "Sun 2000"], "actif": true, "annee_fondation": 1957 },
+    { "marque": "Quicksilver", "pays": "Pologne (groupe Brunswick)", "types": ["open", "pêche-promenade", "day-cruiser"], "modeles_phares": ["Activ 605 Open", "Captur 555 Pilothouse", "Activ 755 Cruiser"], "actif": true, "annee_fondation": 1962 },
+    { "marque": "B2 Marine", "pays": "France", "types": ["open", "pêche-promenade"], "modeles_phares": ["Cap Ferret 552 Sun Deck", "Cap Ferret 752", "Djinn 6.7"], "actif": true, "annee_fondation": 1972 },
+    { "marque": "Ocqueteau", "pays": "France", "types": ["pêche-promenade", "timonier"], "modeles_phares": ["Ostrea 700", "Abaco 24", "Timonier 615"], "actif": true, "annee_fondation": 1953 },
+    { "marque": "Rhéa Marine", "pays": "France", "types": ["timonier", "open chic", "pêche-promenade"], "modeles_phares": ["Rhéa 23 Open", "Rhéa 27 Escapade", "Rhéa 32"], "actif": true, "annee_fondation": 1992 },
+    { "marque": "Beacher", "pays": "France", "types": ["open haut-de-gamme", "day-cruiser"], "modeles_phares": ["V10.2", "V12.2 Sundeck"], "actif": true, "annee_fondation": 2010 },
+    { "marque": "White Shark", "pays": "France", "types": ["open sport", "walkaround"], "modeles_phares": ["WS 285", "WS 326", "WS 226"], "actif": true, "annee_fondation": 1998 },
+    { "marque": "Pacific Craft", "pays": "France", "types": ["open", "pêche-promenade", "walkaround"], "modeles_phares": ["Pacific Craft 625 Open", "750 Sun Cruiser", "27 RX"], "actif": true, "annee_fondation": 2010 },
+    { "marque": "Tofinou (Latitude 46)", "pays": "France", "types": ["day-sailer", "voilier"], "modeles_phares": ["Tofinou 8", "Tofinou 9.7", "Tofinou 12"], "actif": true, "annee_fondation": 1995 },
+    { "marque": "RM Yachts", "pays": "France", "types": ["voilier croisière contreplaqué"], "modeles_phares": ["RM 890", "RM 1070", "RM 1180"], "actif": true, "annee_fondation": 1989 },
+    { "marque": "Pogo Structures", "pays": "France", "types": ["voilier course-croisière"], "modeles_phares": ["Pogo 30", "Pogo 36", "Mini 6.50"], "actif": true, "annee_fondation": 1987 },
+    { "marque": "Edel", "pays": "France", "types": ["voilier transportable", "catamaran"], "modeles_phares": ["Edel II", "Edel 4", "Edel Cat 35"], "actif": false, "annee_fondation": 1956 },
+    { "marque": "Wellcraft", "pays": "USA / France (Groupe Bénéteau)", "types": ["walkaround", "pêche sportive"], "modeles_phares": ["Wellcraft 355", "Wellcraft 435", "Scarab"], "actif": true, "annee_fondation": 1955 },
+    { "marque": "Bayliner", "pays": "USA", "types": ["bowrider", "day-cruiser", "open"], "modeles_phares": ["Bayliner VR5", "Element E18", "M19"], "actif": true, "annee_fondation": 1957 },
+    { "marque": "Boston Whaler", "pays": "USA", "types": ["pêche sportive", "open insubmersible"], "modeles_phares": ["Montauk 170", "Outrage 250", "Dauntless 220"], "actif": true, "annee_fondation": 1958 },
+    { "marque": "Sea Ray", "pays": "USA", "types": ["bowrider", "day-cruiser"], "modeles_phares": ["SPX 190 OB", "SDX 250 OB", "Sundancer 320"], "actif": true, "annee_fondation": 1959 },
+    { "marque": "Parker (Poland)", "pays": "Pologne", "types": ["walkaround", "pêche-promenade"], "modeles_phares": ["Parker 750 Cabin", "Parker 660 Pilothouse", "Parker 850 Voyager"], "actif": true, "annee_fondation": 1990 },
+    { "marque": "Axopar", "pays": "Finlande", "types": ["adventure boat", "day-cruiser"], "modeles_phares": ["Axopar 28", "Axopar 37", "Axopar 22 Spyder"], "actif": true, "annee_fondation": 2014 },
+    { "marque": "Saxdor", "pays": "Finlande", "types": ["open sport", "day-cruiser"], "modeles_phares": ["Saxdor 200 Sport", "Saxdor 270 GTO", "Saxdor 320 GTO"], "actif": true, "annee_fondation": 2020 },
+    { "marque": "Nimbus", "pays": "Suède", "types": ["day-cruiser", "walkaround"], "modeles_phares": ["Nimbus T8", "Nimbus T11", "Nimbus W9"], "actif": true, "annee_fondation": 1968 },
+    { "marque": "Ryck", "pays": "Allemagne (Groupe HanseYachts)", "types": ["day-cruiser", "open"], "modeles_phares": ["Ryck 280", "Ryck 330"], "actif": true, "annee_fondation": 2021 },
+    { "marque": "Nuva Yachts", "pays": "Espagne", "types": ["day-cruiser méditerranéen"], "modeles_phares": ["Nuva M6 Open", "Nuva M8 Cabin", "Nuva MX9"], "actif": true, "annee_fondation": 2017 },
+    { "marque": "Zodiac Nautic", "pays": "France", "types": ["semi-rigide", "annexe pneumatique"], "modeles_phares": ["Medline 7.5", "Open 5.5", "Pro 650"], "actif": true, "annee_fondation": 1934 },
+    { "marque": "Bombard", "pays": "France (groupe Zodiac)", "types": ["semi-rigide", "pneumatique"], "modeles_phares": ["Explorer 600", "Commando C5", "AX3"], "actif": true, "annee_fondation": 1979 },
+    { "marque": "3D Tender", "pays": "France", "types": ["semi-rigide", "annexe"], "modeles_phares": ["Lux 535", "Stealth 540", "Dream 240"], "actif": true, "annee_fondation": 2003 },
+    { "marque": "Highfield", "pays": "Hong Kong / France (coque alu)", "types": ["semi-rigide alu", "annexe pro"], "modeles_phares": ["Highfield Sport 660", "Patrol 660", "Classic 340"], "actif": true, "annee_fondation": 2010 },
+    { "marque": "Capelli", "pays": "Italie", "types": ["semi-rigide haut-de-gamme"], "modeles_phares": ["Tempest 700", "Tempest 900", "Easy Line 505"], "actif": true, "annee_fondation": 1976 },
+    { "marque": "Brig", "pays": "Ukraine", "types": ["semi-rigide premium"], "modeles_phares": ["Eagle 6.7", "Navigator 730", "Falcon 450"], "actif": true, "annee_fondation": 1980 },
+    { "marque": "Joker Boat", "pays": "Italie", "types": ["semi-rigide sport"], "modeles_phares": ["Clubman 24", "Coaster 600", "Wide 750"], "actif": true, "annee_fondation": 1959 },
+    { "marque": "Nuova Jolly", "pays": "Italie", "types": ["semi-rigide", "console centrale"], "modeles_phares": ["Prince 25 Sport Cabin", "King 880", "Black Fin Elegance 8"], "actif": true, "annee_fondation": 1958 },
+    { "marque": "Valiant", "pays": "Espagne (groupe Brunswick)", "types": ["semi-rigide aventure"], "modeles_phares": ["Valiant 750 Sport", "DR 620", "Vanguard V550"], "actif": true, "annee_fondation": 1995 },
+    { "marque": "BWA", "pays": "Italie", "types": ["semi-rigide loisir"], "modeles_phares": ["BWA Sport 22 GT", "BWA Premium 28", "BWA Nautica 19 GT"], "actif": true, "annee_fondation": 1970 }
+  ],
+  "moteurs_horsbord": [
+    { "marque": "Yamaha", "pays": "Japon", "periode": "1960-aujourd'hui", "gamme_cv": "2-450", "statut": "ACTIVE" },
+    { "marque": "Mercury Marine", "pays": "USA", "periode": "1939-aujourd'hui", "gamme_cv": "2.5-600", "statut": "ACTIVE" },
+    { "marque": "Suzuki Marine", "pays": "Japon", "periode": "1965-aujourd'hui", "gamme_cv": "2.5-350", "statut": "ACTIVE" },
+    { "marque": "Honda Marine", "pays": "Japon", "periode": "1964-aujourd'hui", "gamme_cv": "2.3-250", "statut": "ACTIVE" },
+    { "marque": "Tohatsu", "pays": "Japon", "periode": "1956-aujourd'hui", "gamme_cv": "2.5-140", "statut": "ACTIVE" },
+    { "marque": "Selva Marine", "pays": "Italie", "periode": "1963-aujourd'hui", "gamme_cv": "2.5-300", "statut": "ACTIVE" },
+    { "marque": "Parsun", "pays": "Chine", "periode": "2002-aujourd'hui", "gamme_cv": "2.6-60", "statut": "ACTIVE" },
+    { "marque": "Torqeedo", "pays": "Allemagne", "periode": "2005-aujourd'hui", "gamme_cv": "1-80 (équivalent)", "statut": "ACTIVE" },
+    { "marque": "Mariner", "pays": "USA (rebadge Mercury / Yamaha selon époque)", "periode": "1976-2010", "gamme_cv": "2-250", "statut": "FUSIONNEE" },
+    { "marque": "Evinrude", "pays": "USA (BRP)", "periode": "1907-2020", "gamme_cv": "2-300", "statut": "DISPARUE" },
+    { "marque": "Johnson", "pays": "USA (OMC puis BRP)", "periode": "1921-2007", "gamme_cv": "1-250", "statut": "DISPARUE" },
+    { "marque": "OMC (Outboard Marine Corporation)", "pays": "USA", "periode": "1936-2000", "gamme_cv": "1-300", "statut": "DISPARUE" },
+    { "marque": "Force", "pays": "USA (Chrysler → US Marine → Mercury)", "periode": "1984-1999", "gamme_cv": "5-150", "statut": "DISPARUE" },
+    { "marque": "Chrysler Marine", "pays": "USA", "periode": "1965-1984", "gamme_cv": "3.5-150", "statut": "DISPARUE" },
+    { "marque": "Nissan Marine", "pays": "Japon (rebadge Tohatsu)", "periode": "1984-2014", "gamme_cv": "2.5-250", "statut": "DISPARUE" },
+    { "marque": "ELTO", "pays": "USA", "periode": "1921-1936", "gamme_cv": "1-10", "statut": "FUSIONNEE" },
+    { "marque": "Crescent", "pays": "Suède (Nymanbolagen)", "periode": "1954-1979", "gamme_cv": "2-50", "statut": "DISPARUE" },
+    { "marque": "Archimedes", "pays": "Suède", "periode": "1912-1979", "gamme_cv": "2-50", "statut": "DISPARUE" }
+  ],
+  "decodage_plaques_moteur": {
+    "_note": "Connaissance métier pour l'agent IA (V2 + scan plaque) : comment décoder un numéro de série moteur pour en déduire l'année, le modèle, le pays de fabrication.",
+    "suzuki": {
+      "anatomie_plaque": {
+        "structure": "[PRE-FIX] [SERIAL NUMBER] · MODEL: [model]",
+        "exemple": "11501F XXXXXX · MODEL: DF 115",
+        "composantes": {
+          "PRE-FIX": "Code modèle (ex: 11501F) — identifie la famille moteur",
+          "SERIAL_NUMBER": "Numéro séquentiel d'usine",
+          "MODEL": "Nom commercial visible (ex: DF 115 = Diesel Four-stroke 115 CV)"
+        },
+        "infos_complementaires_plaque": [
+          "Pays de fabrication (Made in Japan / Vietnam / Thaïlande / Inde)",
+          "Fabricant (Suzuki Motor Co Ltd ou filiale)",
+          "Marquage CE / UKCA (Europe / UK)",
+          "Puissance nominale en KW",
+          "Année (sur plaques modernes post-2010)"
+        ]
+      },
+      "regle": "Sur les anciens moteurs Suzuki (1983-2004), la dernière lettre du numéro de série indique l'année.",
+      "exemple": "DT40CRSN → le 'N' indique l'année 1992",
+      "table_annees": {
+        "D": 1983, "E": 1984, "F": 1985, "G": 1986, "H": 1987, "J": 1988,
+        "K": 1989, "L": 1990, "M": 1991, "N": 1992, "P": 1993, "R": 1994,
+        "S": 1995, "T": 1996, "V": 1997, "W": 1998, "X": 1999, "Y": 2000,
+        "K1": 2001, "K2": 2002, "K3": 2003, "K4": 2004
+      },
+      "depuis_2010": "Plaque CE européenne avec année explicite (ex: '01504F 2023'), puissance en KW, conformité UKCA.",
+      "lieux_fabrication": "Japon (Hamamatsu) — historique. Vietnam / Thaïlande / Inde — fabrication actuelle pour marchés mondiaux."
+    },
+    "yamaha": {
+      "anatomie_plaque": {
+        "structure": "[MODEL_CODE] [SHAFT_LENGTH_LETTER] [SERIAL_NUMBER] · MODEL: [model_complet]",
+        "exemple": "6G8 L 123456 · MODEL: FT 9.9 AEL",
+        "composantes": {
+          "MODEL_CODE": "Code modèle interne (ex: 6G8, 6E5) — identifie la famille moteur",
+          "SHAFT_LENGTH_LETTER": "Lettre de longueur de colonne (S=15\", L=20\", X=25\", U=30\")",
+          "SERIAL_NUMBER": "Numéro séquentiel d'usine (ex: 1001324)",
+          "MODEL_AFFICHE": "Nom commercial (ex: 'FT 9.9 AEL' = Four-stroke High thrust 9.9 CV variante AEL)"
+        }
+      },
+      "decodage_lettres_modele": {
+        "uitvoering_configuration": {
+          "E": "Manual Tilt / Electric Start",
+          "M": "Manual Tilt / Manual Start",
+          "P": "Power Tilt / Electric Start",
+          "T": "Power Trim & Tilt / Electric Start",
+          "H": "Tiller (barre)",
+          "R": "Remote (commande à distance)"
+        },
+        "shaft_length_longueur_colonne": {
+          "S": "15 pouces",
+          "L": "20 pouces",
+          "X": "25 pouces",
+          "U": "30 pouces"
+        },
+        "type_moteur": {
+          "F": "Four-stroke (4 temps)",
+          "T": "High thrust (gros couple, pour voiliers / pousseurs)"
+        },
+        "series_suffix": {
+          "B": "Inshore Series",
+          "C": "C Series",
+          "D": "Twin Props",
+          "E": "Enduro Series",
+          "F": "Four Stroke",
+          "L": "Counter Rotation",
+          "P": "Pro Series",
+          "S": "Saltwater Series",
+          "T": "High Thrust",
+          "V": "VMAX Series"
+        }
+      },
+      "table_annees_modele": {
+        "_note_important": "ATTENTION : les lettres CYCLENT tous les 10 ans environ. Un 'L' peut être 1984 OU 1976. Il faut croiser avec le code modèle pour lever l'ambiguïté. Source : tableau Yamaha original.",
+        "1973": "Z", "1974": "Y", "1975": "X", "1976": "W", "1977": "V", "1978": "U", "1979": "T", "1980": "S", "1981": "R", "1982": "Q",
+        "1983": "P", "1984": "L", "1985": "K", "1986": "J", "1987": "H", "1988": "G", "1989": "F", "1990": "D", "1991": "C", "1992": "B",
+        "1993": "A", "1994": "Z", "1995": "Y", "1996": "X", "1997": "W", "1998": "V", "1999": "U", "2000": "T", "2001": "S", "2002": "R",
+        "2003": "Q", "2004": "P", "2005": "N", "2006": "K", "2007": "J", "2008": "H", "2009": "G", "2010": "F", "2011": "E", "2012": "D",
+        "2013": "B", "2014": "A"
+      },
+      "table_annees_simplifiee_1984_2004": {
+        "_note": "Version simplifiée pour les moteurs Yamaha de 1984 à 2004 où la dernière lettre du n° de modèle indique l'année.",
+        "N": 1984, "K": 1985, "J": 1986, "H": 1987, "G": 1988, "F": 1989, "D": 1990,
+        "P": 1991, "Q": 1992, "R": 1993, "S": 1994, "T": 1995, "U": 1996, "V": 1997,
+        "W": 1998, "X": 1999, "Y": 2000, "Z": 2001, "A": 2002, "B": 2003, "C": 2004
+      },
+      "note_post_2005": "À partir de 2005, Yamaha a arrêté d'inclure l'année dans le n° de modèle. La date de production se trouve sur le 'transom bracket' (support arrière) des moteurs post-2004.",
+      "exemple_complet": "SX150TLRY1 → le 'Y' indique l'année 2000 (génération 1984-2004)",
+      "exemple_etiquette_reelle": "115CETO · 6E5 · L 1001324 · Made in Japan → modèle 115 CETO, code 6E5, longueur L (20\"), série 1001324, lettre 'L' = 1984 OU 1976 (à valider par code modèle)"
+    },
+    "mercury": "Pattern propriétaire (rebadgeage Tohatsu sur petits modèles, codes US différents) — à scraper en V2.",
+    "format_helices_marines": {
+      "_note": "Référence standard internationale gravée sur les hélices hors-bord (toutes marques). Format pour le scan plaque V2 + contexte agent IA.",
+      "format": "[PALES]X[DIAMETRE]X[PAS][SENS]",
+      "exemple_reel": "3X16X23R",
+      "composantes": {
+        "PALES": "Nombre de pales (typiquement 3, parfois 4 pour le couple/grosse charge)",
+        "DIAMETRE": "Diamètre de l'hélice en pouces (16\" = standard moteur 150 CV)",
+        "PAS": "Pitch / pas en pouces (distance théorique parcourue en 1 tour) — détermine couple vs vitesse",
+        "SENS": "R = Right hand (rotation horaire, standard mono-motorisation) · L = Left hand (rotation anti-horaire, utilisé en bi-motorisation pour compenser le couple)"
+      },
+      "regles_metier": [
+        "Sur bi-motorisation : un moteur R + un moteur L pour annuler le couple latéral",
+        "Pas plus grand = vitesse de pointe plus haute mais accélération moindre",
+        "Pas plus petit = meilleure accélération mais vitesse limitée",
+        "Diamètre dépend du moteur (CV) et du type de bateau (charge, programme)"
+      ]
+    },
+    "ressources_utiles": [
+      "https://www.suzukimarine.com/serial-number-decoder",
+      "https://www.yamaha-motor.com/marine/owner-resources"
+    ]
+  },
+  "sources_principales": [
+    "https://www.bateaux.com/dossier/marques-bateaux-moteur",
+    "https://www.bateaux.com/dossier/marques-semi-rigides",
+    "https://fr.wikipedia.org/wiki/Edel_(constructeur)",
+    "https://en.wikipedia.org/wiki/Evinrude_Outboard_Motors",
+    "https://en.wikipedia.org/wiki/Nissan_Outboard_Motors",
+    "https://en.wikipedia.org/wiki/Mercury_Marine",
+    "https://www.guide-plaisance-mobile.fr/histoire-moteur-hors-bord",
+    "https://www.actunautique.com/2026/02/groupe-beneteau-une-annee-2025-entre-destockage-et-retour-annonce-a-la-croissance.html",
+    "https://boatcible.com/2026/01/20/day-cruisers-8-metres-2026/",
+    "https://www.hisse-et-oh.com/sailing/liens-entre-marques-de-moteurs-hors-bord",
+    "https://everythingaboutboats.org/chrysler-force/",
+    "http://www.lagerholm.com/SOM/",
+    "https://oria-marine.com/fr/articles/meilleurs-moteurs-hors-bord-en-2025"
+  ]
+}

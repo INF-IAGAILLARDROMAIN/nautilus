@@ -44,6 +44,17 @@ enum UrgenceOR {
   URGENT
 }
 
+enum TypeCoque {
+  STRATIFIE      // polyester / composite / fibre de verre (majorité)
+  ALUMINIUM      // coque alu rivetée ou soudée
+  POLYETHYLENE   // rotomoulé
+  SEMI_RIGIDE    // coque rigide + flotteurs gonflables
+  PNEUMATIQUE    // 100 % gonflable
+  BOIS           // construction traditionnelle (rare)
+  ACIER          // très rare en plaisance hors-bord
+  AUTRE          // cas non prévu — détail dans notes
+}
+
 enum StatutOR {
   CREE
   EN_COURS
@@ -78,12 +89,37 @@ model Client {
 
 /// Un bateau appartenant à un client. Un client peut avoir plusieurs bateaux.
 model Bateau {
-  id           String  @id @default(cuid())
-  marque       String
-  modele       String
-  /// Numéro de plaque du moteur hors-bord — identifiant terrain unique.
-  plaqueMoteur String  @unique
-  annee        Int?
+  id              String     @id @default(cuid())
+  /// Surnom donné par le propriétaire (ex: "Le Petit Bleu"). Optionnel.
+  nom             String?    @db.VarChar(60)
+  /// Marque constructeur de la COQUE (Bénéteau, Quicksilver, Zodiac…).
+  marque          String
+  /// Modèle de la coque (Antares 7, Activ 605…).
+  modele          String
+  /// Matériau / type de coque (stratifiée, aluminium, semi-rigide, etc.).
+  typeCoque       TypeCoque  @default(STRATIFIE)
+  /// Immatriculation française (Affaires Maritimes), optionnelle (ex: AY-67890).
+  immatriculation String?    @db.VarChar(20)
+  annee           Int?
+  /// Notes générales sur le bateau (coque, déco, équipements).
+  notes           String?    @db.Text
+
+  // === MOTORISATION (V1 : 1 moteur par bateau dans la même table) ===
+  // V2 RANKIA prévue : extraire en entité Moteur séparée avec relation 1:N
+  // pour supporter la multi-motorisation native (bi, tri, quadri…).
+  /// Marque du moteur (Yamaha, Suzuki, Mercury, Evinrude…).
+  marqueMoteur    String?
+  /// Modèle du moteur (F250, DF150…).
+  modeleMoteur    String?
+  /// Numéro de plaque / série du moteur — identifiant terrain UNIQUE.
+  /// Optionnel : une plaque peut être tombée, effacée ou retirée.
+  /// PostgreSQL autorise plusieurs NULL avec UNIQUE — donc plusieurs bateaux
+  /// peuvent ne pas avoir de plaque renseignée sans violer la contrainte.
+  plaqueMoteur    String?    @unique
+  /// Puissance moteur en chevaux (CV).
+  puissanceCV     Int?
+  /// Hélice : description libre (ex: "3 pales inox 14\"").
+  helice          String?    @db.VarChar(100)
 
   clientId String
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
@@ -95,6 +131,7 @@ model Bateau {
 
   @@index([clientId])
   @@index([marque, modele])
+  @@index([marqueMoteur])
 }
 
 /// Devis = chiffrage proposé au client AVANT le travail.

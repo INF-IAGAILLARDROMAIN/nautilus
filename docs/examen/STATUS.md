@@ -51,12 +51,22 @@
   - `/dashboard/or` — liste avec type + urgence + mécano + numéro facture
   - `/dashboard/factures` — OR filtrés au statut `FACTURE`
 - Sidebar épurée (6 liens, plus aucun lien fantôme)
-- **Auth Supabase complète** ⭐ NEW
+- **Auth Supabase complète**
   - Login branché à `signInWithPassword` avec gestion loading/erreurs FR
   - Logout branché à `signOut`
   - Proxy (Next.js 16) qui protège `/dashboard/*` et redirige `/` vers `/dashboard` si connecté
   - Sessions stockées en cookies httpOnly (sécurisé)
   - Compte test créé via API Admin Supabase, mot de passe fort dans 1Password
+- **Formulaires CUD (Create) opérationnels** ⭐ NEW
+  - `/dashboard/clients/nouveau` : React Hook Form + Zod + toasts Sonner
+  - `/dashboard/bateaux/nouveau` : Combobox client + cascade marque → modèle + autocomplétion fuzzy (32 marques bateaux, 18 marques moteurs) + dropdown type coque (8 valeurs) + plaque moteur optionnelle
+  - Composant `AutocompleteInput` réutilisable avec normalisation des accents (Unicode NFD)
+  - Listes statiques `src/lib/data/marques.ts` : MARQUES_BATEAUX, MARQUES_MOTEURS, MODELES_BATEAUX_PAR_MARQUE
+- **Modèle Bateau enrichi**
+  - Champs ajoutés : `nom` (surnom), `typeCoque` (enum 8 valeurs), `immatriculation`, `notes`
+  - Champs moteur intégrés : `marqueMoteur`, `modeleMoteur`, `puissanceCV`, `helice`
+  - `plaqueMoteur` rendue optionnelle (plaque tombée/effacée/retirée — cas métier réel)
+  - V1 = 1 moteur par bateau · V2 prévue : entité Moteur séparée + cas "moteur sans bateau"
 
 ### Qualité / Outils
 - Audit `npm` après chaque install (règle systématique)

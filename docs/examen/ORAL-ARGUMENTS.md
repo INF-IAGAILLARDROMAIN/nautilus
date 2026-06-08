@@ -129,7 +129,11 @@
 
 > *"J'ai distingué deux types de listes selon leur usage métier : les listes annuaire (Clients, Bateaux) sont triées alphabétiquement par défaut pour faciliter la recherche visuelle, comme dans les ERP métier type Infocob que j'ai utilisé en tant que mécanicien nautique ; les listes flux (Devis, OR, Factures) sont triées par date décroissante pour mettre en avant les éléments récents qui nécessitent une action. Je n'ai pas implémenté de sélecteur de tri dynamique parce que Nautilus apporte une chose qu'Infocob n'a pas : un agent IA qui permet de poser des questions en langage naturel comme 'tous les clients de Quiberon' ou 'les bateaux Yamaha facturés en mai'. L'agent IA rend le tri dynamique accessoire — il est plus puissant et plus naturel à utiliser."*
 
-### 4.8 Type d'OR par défaut REPARATION (limitation V1)
+### 4.8 Moteur sans bateau — limitation V1, cas métier réel
+
+> *"En V1, le moteur est rattaché à un bateau via des colonnes dans la table Bateau. Mais en mécanique nautique, un client peut très bien posséder un moteur SANS bateau associé : moteur de remplacement en stock, moteur d'occasion acheté en attente d'installation, moteur consigné à l'atelier après revente du bateau qui le portait. C'est pourquoi la V2 prévoit une entité Moteur séparée avec deux relations : Moteur → Client obligatoire, et Moteur → Bateau optionnelle. Cette finesse métier vient de mon parcours d'ex-mécanicien nautique."*
+
+### 4.9 Type d'OR par défaut REPARATION (limitation V1)
 
 > *"À la création automatique d'un OR depuis un devis validé, le type par défaut est REPARATION car la majorité des interventions en sont. Mais ce comportement doit évoluer : idéalement, le type devrait être demandé au chef d'atelier lors de la validation du devis (entretien planifié, panne, hivernage, déshivernage, dépannage), pour qu'il soit cohérent dès le départ. C'est une amélioration documentée pour la V2."*
 

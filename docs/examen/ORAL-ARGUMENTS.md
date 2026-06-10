@@ -73,6 +73,16 @@
 
 > *"Côté backend NestJS, j'utilise Helmet pour les headers HTTP sécurisés (HSTS, X-Frame-Options, CSP), un CORS strict limité à l'origine du frontend, un ValidationPipe global qui rejette tout champ non déclaré dans le DTO, un ThrottlerGuard pour le rate limiting global, et Prisma avec des requêtes paramétrées qui protège contre les injections SQL par construction."*
 
+### 2.11 Stockage du nom/prénom utilisateur dans Supabase (pas de table dédiée)
+
+**Contexte** : si le jury demande pourquoi je n'ai pas créé une table `profils` en base pour le nom et le prénom des utilisateurs.
+
+> *"Supabase a un emplacement libre pour stocker un nom, un prénom — j'ai utilisé ça plutôt que de créer une table dédiée. C'est plus simple et c'est suffisant pour ce besoin."*
+
+**Si on me pousse à préciser** : *"C'est un champ Supabase qui s'appelle `user_metadata`, c'est un objet JSON libre."* — puis si on insiste encore : *"Côté Postgres c'est stocké en type JSONB."*
+
+**Si on me demande pourquoi pas une table** : *"Pour des données métier complexes — plusieurs champs liés, des relations, de l'historisation — je créerais une vraie table. Là c'est juste un nom et un prénom, ça reste dans le périmètre Auth."*
+
 ---
 
 ## 🎨 3 — UX & frontend

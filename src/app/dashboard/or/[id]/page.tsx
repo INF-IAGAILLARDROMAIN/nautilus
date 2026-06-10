@@ -13,6 +13,7 @@ import {
   Anchor,
   AlertTriangle,
   FileText,
+  Download,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -77,6 +78,44 @@ export default function OrDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const [pdfLoading, setPdfLoading] = useState<null | "or" | "facture">(null);
+
+  // Petit helper de téléchargement commun aux 2 boutons (OR et facture)
+  async function downloadBlob(filename: string, fetcher: () => Promise<Blob>) {
+    const t = toast.loading("Génération du PDF…");
+    try {
+      const blob = await fetcher();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("PDF téléchargé", { id: t });
+    } catch (err) {
+      toast.error("Téléchargement impossible", {
+        id: t,
+        description: (err as Error).message,
+      });
+    }
+  }
+
+  async function handleDownloadOr(numeroDevis: string) {
+    setPdfLoading("or");
+    await downloadBlob(`OR-${numeroDevis}.pdf`, () => api.or.downloadOrPdf(id));
+    setPdfLoading(null);
+  }
+
+  async function handleDownloadFacture(numeroFacture: string) {
+    setPdfLoading("facture");
+    await downloadBlob(`${numeroFacture}.pdf`, () =>
+      api.or.downloadFacturePdf(id),
+    );
+    setPdfLoading(null);
+  }
+
   const queryClient = useQueryClient();
   const [mecanoDraft, setMecanoDraft] = useState<string | null>(null);
 
@@ -348,11 +387,51 @@ export default function OrDetailPage({
           </div>
         </section>
 
-        {or.statut === "FACTURE" && (
-          <Button asChild variant="outline" className="w-full" disabled>
-            <span>📄 Télécharger la facture PDF (bientôt)</span>
+        {/* Boutons PDF : OR toujours (document interne pour le mécano) +
+            Facture si statut FACTURE (document client). */}
+        <div className="space-y-2">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() =>
+              or.devis && handleDownloadOr(or.devis.numeroDevis)
+            }
+            disabled={pdfLoading !== null}
+          >
+            {pdfLoading === "or" ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Génération…
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4 mr-2" />
+                Télécharger l&apos;OR en PDF (pour le mécano)
+              </>
+            )}
           </Button>
-        )}
+
+          {or.statut === "FACTURE" && or.numeroFacture && (
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => handleDownloadFacture(or.numeroFacture!)}
+              disabled={pdfLoading !== null}
+            >
+              {pdfLoading === "facture" ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Génération…
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  Télécharger la facture {or.numeroFacture} en PDF
+                </>
+              )}
+            </Button>
+          )}
+        </div>
       </main>
     </div>
   );

@@ -247,6 +247,20 @@ export const api = {
         method: "PATCH",
         body: JSON.stringify({ statut }),
       }),
+    /**
+     * Télécharge le PDF du devis en passant le JWT en header.
+     * Renvoie un Blob qu'on transforme côté UI en téléchargement / preview.
+     */
+    downloadPdf: async (id: string): Promise<Blob> => {
+      const token = await getAccessToken();
+      const res = await fetch(`${API_URL}/devis/${id}/pdf`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) {
+        throw new Error(`[API ${res.status}] PDF devis ${id} indisponible`);
+      }
+      return res.blob();
+    },
   },
   or: {
     list: () => request<Paginated<OrdreReparation>>("/or"),
@@ -261,6 +275,34 @@ export const api = {
         method: "PATCH",
         body: JSON.stringify({ mecano }),
       }),
+    /**
+     * Télécharge le PDF de l'OR (document interne pour le mécano).
+     * Cases à cocher, zone observations, signature mécano.
+     */
+    downloadOrPdf: async (id: string): Promise<Blob> => {
+      const token = await getAccessToken();
+      const res = await fetch(`${API_URL}/or/${id}/pdf`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) {
+        throw new Error(`[API ${res.status}] PDF OR ${id} indisponible`);
+      }
+      return res.blob();
+    },
+    /**
+     * Télécharge le PDF de la facture (OR au statut FACTURE uniquement).
+     * Erreur 400 si l'OR n'est pas encore facturé.
+     */
+    downloadFacturePdf: async (id: string): Promise<Blob> => {
+      const token = await getAccessToken();
+      const res = await fetch(`${API_URL}/or/${id}/facture-pdf`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) {
+        throw new Error(`[API ${res.status}] PDF facture ${id} indisponible`);
+      }
+      return res.blob();
+    },
   },
   factures: {
     // Une facture = un OR au statut FACTURE.

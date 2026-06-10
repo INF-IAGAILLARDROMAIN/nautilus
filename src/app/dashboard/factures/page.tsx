@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   FileText,
   Loader2,
@@ -15,6 +16,28 @@ import { Button } from "@/components/ui/button";
 import { ListPageHeader } from "@/components/list-page-header";
 import { normalizeForSearch } from "@/lib/data/marques";
 import { api, type OrdreReparation } from "@/lib/api";
+
+async function downloadFacture(or: OrdreReparation) {
+  if (!or.numeroFacture) return;
+  const t = toast.loading("Génération du PDF…");
+  try {
+    const blob = await api.or.downloadFacturePdf(or.id);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${or.numeroFacture}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("PDF téléchargé", { id: t });
+  } catch (err) {
+    toast.error("Téléchargement impossible", {
+      id: t,
+      description: (err as Error).message,
+    });
+  }
+}
 
 function formatEuro(value: string | number) {
   const n = typeof value === "string" ? parseFloat(value) : value;
@@ -186,11 +209,10 @@ export default function FacturesListPage() {
                       variant="outline"
                       size="sm"
                       className="text-xs h-8"
-                      disabled
-                      title="Génération PDF à venir"
+                      onClick={() => downloadFacture(f)}
                     >
                       <Download className="h-3.5 w-3.5 mr-1.5" />
-                      Télécharger le PDF (bientôt)
+                      Télécharger le PDF
                     </Button>
                   </div>
                 </div>

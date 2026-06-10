@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +16,7 @@ import {
   Anchor,
   Calendar,
   CreditCard,
+  Download,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -74,11 +75,40 @@ export default function DevisDetailPage({
   const { id } = use(params);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   const devisQuery = useQuery({
     queryKey: ["devis", id],
     queryFn: () => api.devis.get(id),
   });
+
+  // Téléchargement du PDF du devis. On fetch en mémoire (le JWT doit passer
+  // en header → impossible avec un simple <a href>), puis on déclenche un
+  // download depuis un Blob URL temporaire.
+  async function handleDownloadPdf() {
+    if (!devisQuery.data) return;
+    setPdfLoading(true);
+    const t = toast.loading("Génération du PDF…");
+    try {
+      const blob = await api.devis.downloadPdf(id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${devisQuery.data.numeroDevis}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("PDF téléchargé", { id: t });
+    } catch (err) {
+      toast.error("Téléchargement impossible", {
+        id: t,
+        description: (err as Error).message,
+      });
+    } finally {
+      setPdfLoading(false);
+    }
+  }
 
   const updateStatut = useMutation({
     mutationFn: (statut: StatutDevis) => api.devis.updateStatut(id, statut),
@@ -339,15 +369,24 @@ export default function DevisDetailPage({
           </div>
         </section>
 
-        {/* Bouton vers le PDF (S2) */}
+        {/* Téléchargement du PDF du devis (mentions légales FR + RGPD + signature) */}
         <Button
-          asChild
           variant="outline"
           className="w-full"
-          disabled
-          title="Génération PDF prévue en S2"
+          onClick={handleDownloadPdf}
+          disabled={pdfLoading}
         >
-          <span>📄 Télécharger en PDF (bientôt)</span>
+          {pdfLoading ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Génération…
+            </>
+          ) : (
+            <>
+              <Download className="h-4 w-4 mr-2" />
+              Télécharger le devis en PDF
+            </>
+          )}
         </Button>
       </main>
     </div>

@@ -112,6 +112,7 @@ export class OrdreReparationService {
       include: {
         devis: {
           include: {
+            client: true, // direct (utile pour facture sans bateau — cas pré-vente)
             bateau: { include: { client: true } },
             lignes: { orderBy: { ordre: 'asc' } },
           },

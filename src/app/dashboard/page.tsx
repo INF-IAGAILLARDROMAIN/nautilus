@@ -23,32 +23,60 @@ import { LogoutButton } from "@/components/logout-button";
 import { createClient } from "@/lib/supabase/client";
 import { api } from "@/lib/api";
 
-// Dérive un prénom et 2 initiales depuis les infos Supabase :
-//   user_metadata.name / full_name / first_name → "Romain"
-//   ou fallback sur la partie locale de l'email → "ro"
+// Dérive le prénom + 2 initiales (prénom + nom) depuis la session Supabase.
+// Cherche dans l'ordre :
+//   1. user_metadata.first_name + user_metadata.last_name (les 2 séparés → idéal)
+//   2. user_metadata.full_name OU .name avec ≥ 2 mots → splitté
+//   3. partie locale de l'email type "prenom.nom@" / "prenom-nom@" / "prenom_nom@"
+//   4. fallback : initiale du prénom + "?" (signal visible "metadata incomplète")
 function extractIdentity(user: {
   email?: string | null;
   user_metadata?: Record<string, unknown>;
 } | null): { firstName: string; initials: string } {
   if (!user) return { firstName: "", initials: "…" };
   const meta = user.user_metadata ?? {};
-  const fullName =
-    (typeof meta.name === "string" && meta.name) ||
-    (typeof meta.full_name === "string" && meta.full_name) ||
-    (typeof meta.first_name === "string" && meta.first_name) ||
-    "";
-  if (fullName.trim()) {
-    const parts = fullName.trim().split(/\s+/);
-    const initials =
-      parts.length >= 2
-        ? `${parts[0][0]}${parts[parts.length - 1][0]}`
-        : parts[0].slice(0, 2);
-    return { firstName: parts[0], initials: initials.toUpperCase() };
+
+  // Priorité 1 : prénom + nom séparés
+  const firstName =
+    (typeof meta.first_name === "string" && meta.first_name.trim()) || "";
+  const lastName =
+    (typeof meta.last_name === "string" && meta.last_name.trim()) || "";
+  if (firstName && lastName) {
+    return {
+      firstName,
+      initials: `${firstName[0]}${lastName[0]}`.toUpperCase(),
+    };
   }
+
+  // Priorité 2 : full_name ou name avec ≥ 2 mots
+  const fullName =
+    (typeof meta.full_name === "string" && meta.full_name) ||
+    (typeof meta.name === "string" && meta.name) ||
+    "";
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return {
+      firstName: firstName || parts[0],
+      initials: `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase(),
+    };
+  }
+
+  // Priorité 3 : email type prenom.nom@ / prenom-nom@ / prenom_nom@
   const local = (user.email ?? "").split("@")[0] ?? "";
+  const localParts = local.split(/[._-]/).filter((p) => /^[a-z]+$/i.test(p));
+  if (localParts.length >= 2) {
+    return {
+      firstName: firstName || parts[0] || localParts[0],
+      initials:
+        `${localParts[0][0]}${localParts[localParts.length - 1][0]}`.toUpperCase(),
+    };
+  }
+
+  // Priorité 4 : on a juste un prénom (ou rien) → "R?" pour signaler le manque
+  const fallbackFirst = firstName || parts[0] || local;
   return {
-    firstName: local || "",
-    initials: (local.slice(0, 2) || "?").toUpperCase(),
+    firstName: fallbackFirst,
+    initials: `${(fallbackFirst[0] ?? "?").toUpperCase()}?`,
   };
 }
 

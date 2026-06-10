@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -19,7 +20,37 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LogoutButton } from "@/components/logout-button";
+import { createClient } from "@/lib/supabase/client";
 import { api } from "@/lib/api";
+
+// Dérive un prénom et 2 initiales depuis les infos Supabase :
+//   user_metadata.name / full_name / first_name → "Romain"
+//   ou fallback sur la partie locale de l'email → "ro"
+function extractIdentity(user: {
+  email?: string | null;
+  user_metadata?: Record<string, unknown>;
+} | null): { firstName: string; initials: string } {
+  if (!user) return { firstName: "", initials: "…" };
+  const meta = user.user_metadata ?? {};
+  const fullName =
+    (typeof meta.name === "string" && meta.name) ||
+    (typeof meta.full_name === "string" && meta.full_name) ||
+    (typeof meta.first_name === "string" && meta.first_name) ||
+    "";
+  if (fullName.trim()) {
+    const parts = fullName.trim().split(/\s+/);
+    const initials =
+      parts.length >= 2
+        ? `${parts[0][0]}${parts[parts.length - 1][0]}`
+        : parts[0].slice(0, 2);
+    return { firstName: parts[0], initials: initials.toUpperCase() };
+  }
+  const local = (user.email ?? "").split("@")[0] ?? "";
+  return {
+    firstName: local || "",
+    initials: (local.slice(0, 2) || "?").toUpperCase(),
+  };
+}
 
 // Dashboard épuré — Option B (1 rôle, périmètre examen)
 // Cœur examen = barre de recherche IA en langage naturel.
@@ -27,6 +58,18 @@ import { api } from "@/lib/api";
 // des pages Devis / OR / Factures (toutes branchées API, plus aucun mock).
 
 export default function DashboardPage() {
+  const [identity, setIdentity] = useState<{
+    firstName: string;
+    initials: string;
+  }>({ firstName: "", initials: "…" });
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      setIdentity(extractIdentity(data.user));
+    });
+  }, []);
+
   const clientsQuery = useQuery({
     queryKey: ["clients"],
     queryFn: api.clients.list,
@@ -74,7 +117,7 @@ export default function DashboardPage() {
             <LogoutButton />
             <Avatar className="h-9 w-9 ring-2 ring-primary-foreground/40">
               <AvatarFallback className="bg-accent text-accent-foreground font-bold text-sm">
-                RG
+                {identity.initials}
               </AvatarFallback>
             </Avatar>
           </div>
@@ -85,7 +128,7 @@ export default function DashboardPage() {
         {/* Cœur examen : barre de recherche IA en langage naturel */}
         <section>
           <h1 className="text-2xl font-bold tracking-tight mb-1">
-            Bonjour, Romain 👋
+            Bonjour{identity.firstName ? `, ${identity.firstName}` : ""} 👋
           </h1>
           <p className="text-sm text-muted-foreground mb-4">
             Pose ta question en français, l&apos;assistant interroge la base

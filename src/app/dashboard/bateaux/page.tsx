@@ -1,16 +1,39 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Anchor, FileText, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ListPageHeader } from "@/components/list-page-header";
+import { normalizeForSearch } from "@/lib/data/marques";
 import { api, type Bateau } from "@/lib/api";
 
 export default function BateauxListPage() {
+  const [query, setQuery] = useState("");
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["bateaux"],
     queryFn: api.bateaux.list,
+  });
+
+  // Filtrage côté client sur marque/modèle/nom/plaque/moteur/client (accents ignorés)
+  const filtered = (data?.data ?? []).filter((b) => {
+    if (!query.trim()) return true;
+    const q = normalizeForSearch(query);
+    return (
+      normalizeForSearch(b.marque).includes(q) ||
+      normalizeForSearch(b.modele).includes(q) ||
+      (b.nom ? normalizeForSearch(b.nom).includes(q) : false) ||
+      (b.plaqueMoteur
+        ? normalizeForSearch(b.plaqueMoteur).includes(q)
+        : false) ||
+      (b.marqueMoteur ? normalizeForSearch(b.marqueMoteur).includes(q) : false) ||
+      (b.modeleMoteur ? normalizeForSearch(b.modeleMoteur).includes(q) : false) ||
+      (b.client
+        ? normalizeForSearch(`${b.client.nom} ${b.client.prenom}`).includes(q)
+        : false)
+    );
   });
 
   return (
@@ -30,9 +53,18 @@ export default function BateauxListPage() {
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-5">
         <Input
           type="search"
-          placeholder="Rechercher par marque, modèle, plaque moteur…"
+          placeholder="Rechercher par marque, modèle, plaque, moteur, client…"
           className="h-12 text-base"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
+
+        {query && data && (
+          <p className="text-xs text-muted-foreground">
+            {filtered.length} résultat{filtered.length > 1 ? "s" : ""} sur{" "}
+            {data.total}
+          </p>
+        )}
 
         {isLoading && (
           <div className="flex items-center justify-center gap-2 p-12 text-muted-foreground">
@@ -60,12 +92,21 @@ export default function BateauxListPage() {
           </div>
         )}
 
-        {data && data.data.length > 0 && (
+        {data && data.data.length > 0 && filtered.length === 0 && (
+          <div className="p-8 text-center rounded-xl border border-dashed bg-muted/30">
+            <p className="font-semibold">Aucun bateau ne correspond à « {query} »</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Essaie un autre terme ou crée un nouveau bateau.
+            </p>
+          </div>
+        )}
+
+        {data && filtered.length > 0 && (
           <div className="space-y-3">
-            {data.data.map((b: Bateau) => (
-              <button
+            {filtered.map((b: Bateau) => (
+              <Link
                 key={b.id}
-                type="button"
+                href={`/dashboard/bateaux/${b.id}`}
                 className="w-full flex items-start gap-3 p-4 rounded-xl bg-card border text-left active:scale-[0.99] transition-transform hover:bg-muted/30"
               >
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary text-white">
@@ -122,7 +163,7 @@ export default function BateauxListPage() {
                   </div>
                 </div>
                 <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0 mt-1" />
-              </button>
+              </Link>
             ))}
           </div>
         )}

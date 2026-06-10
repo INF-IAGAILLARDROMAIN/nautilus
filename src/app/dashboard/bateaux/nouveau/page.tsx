@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -85,6 +85,10 @@ const TYPES_COQUE: { value: TypeCoque; label: string; hint: string }[] = [
 export default function NouveauBateauPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  // Pré-remplissage depuis la page détail Client
+  // (ex. /dashboard/bateaux/nouveau?clientId=xxx)
+  const searchParams = useSearchParams();
+  const presetClientId = searchParams.get("clientId") ?? "";
   const [clientSearch, setClientSearch] = useState("");
   const [clientPickerOpen, setClientPickerOpen] = useState(false);
 
@@ -103,7 +107,7 @@ export default function NouveauBateauPage() {
   } = useForm<FormValues>({
     resolver: zodResolver(BateauSchema),
     defaultValues: {
-      clientId: "",
+      clientId: presetClientId,
       nom: "",
       marque: "",
       modele: "",

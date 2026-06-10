@@ -72,18 +72,20 @@ Choix arrêté le 01/06/2026, sur conseil de Fabien Leyrissoux (Lead dev INF-IA,
 | Entité | Attributs principaux | Statuts |
 |---|---|---|
 | **Client** | id · nom · prénom · email · téléphone · adresse · type (particulier/pro) · createdAt | — |
-| **Bateau** | id · marque · modèle · numéro de plaque moteur (unique) · année · clientId (FK) · createdAt | — |
-| **Devis** | id · lignes (table dédiée) · totalHT · TVA · totalTTC · bateauId (FK) · numéroDevis · createdAt | brouillon → envoyé → validé → refusé |
+| **Bateau** | id · nom (surnom facultatif) · marque · modèle · typeCoque (enum 8 valeurs) · immatriculation · année · marqueMoteur · modeleMoteur · puissanceCV · hélice · plaqueMoteur (unique, optionnel) · notes · clientId (FK obligatoire) · createdAt | — |
+| **Devis** | id · lignes (table dédiée) · totalHT · TVA · totalTTC · **clientId (FK obligatoire)** · **bateauId (FK optionnel)** · description · dateValidite · modalitesPaiement · numéroDevis · createdAt | brouillon → transmis → validé → refusé |
 | **OR** (Ordre de Réparation) | id · description · type (entretien/réparation/hivernage/déshivernage/dépannage) · urgence (normal/urgent) · mécano (string libre) · devisId (FK, unique) · numéroFacture (généré au passage "facturé") · createdAt | créé → en cours → terminé → facturé |
 
 > **Note importante** : la **Facture n'est PAS une entité séparée** — c'est un **PDF généré à la volée** à partir de l'OR + son Devis lié, quand l'OR passe en statut "terminé" puis "facturé". Le PDF reprend les lignes du devis avec la mention "FACTURE" et un numéro de facture séquentiel.
 
+> **Note Devis sans bateau** : le `bateauId` du Devis a été rendu **optionnel** (le `clientId` reste obligatoire). Cela couvre les cas métier réels : devis de pré-vente / d'achat (bateau pas encore au nom du client), devis d'accessoires ou de pièces, devis sur un bateau pas encore enregistré dans le système. Côté UI, la cascade Client → Bateau permet de filtrer les bateaux à ceux du client choisi.
+
 **Cycle de vie du flux :**
-1. Le chef crée un **Devis** sur un bateau (statut `brouillon`)
-2. Le chef génère un PDF "Devis" et l'envoie au client (statut `envoyé`)
+1. Le chef crée un **Devis** pour un client (avec ou sans bateau lié) — statut `brouillon`
+2. Le chef génère un PDF "Devis" et l'envoie au client (statut `transmis` — pas d'envoi email auto en V1, juste imprimable/téléchargeable)
 3. Le client accepte → le chef passe le devis en `validé`, ce qui **déclenche la création d'un OR** lié
 4. Le mécano exécute le travail (statut OR `créé` → `en cours` → `terminé`)
-5. Le chef facture (statut OR `facturé`) → **génère le PDF Facture** (numéro de facture séquentiel)
+5. Le chef facture (statut OR `facturé`) → **génère le PDF Facture** (numéro de facture séquentiel `FAC-AAAA-XXXX`)
 
 ---
 

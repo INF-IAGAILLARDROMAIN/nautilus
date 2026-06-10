@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Receipt, Loader2, Anchor } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ListPageHeader } from "@/components/list-page-header";
+import { normalizeForSearch } from "@/lib/data/marques";
 import { api, type Devis, type StatutDevis } from "@/lib/api";
 
 function statutBadge(statut: StatutDevis) {
@@ -42,9 +44,32 @@ function formatEuro(value: string | number) {
 }
 
 export default function DevisListPage() {
+  const [query, setQuery] = useState("");
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["devis"],
     queryFn: api.devis.list,
+  });
+
+  // Filtrage côté client : numéro, description, client, bateau (accents ignorés)
+  const filtered = (data?.data ?? []).filter((d) => {
+    if (!query.trim()) return true;
+    const q = normalizeForSearch(query);
+    // Le client peut venir soit directement (devis sans bateau) soit via le bateau
+    const client = d.client ?? d.bateau?.client;
+    const clientStr = client
+      ? normalizeForSearch(`${client.nom} ${client.prenom}`)
+      : "";
+    const bateauStr = d.bateau
+      ? normalizeForSearch(
+          `${d.bateau.marque} ${d.bateau.modele} ${d.bateau.nom ?? ""}`,
+        )
+      : "";
+    return (
+      normalizeForSearch(d.numeroDevis).includes(q) ||
+      (d.description ? normalizeForSearch(d.description).includes(q) : false) ||
+      clientStr.includes(q) ||
+      bateauStr.includes(q)
+    );
   });
 
   return (
@@ -64,9 +89,18 @@ export default function DevisListPage() {
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-5">
         <Input
           type="search"
-          placeholder="Rechercher par numéro, client, bateau…"
+          placeholder="Rechercher par numéro, client, bateau, description…"
           className="h-12 text-base"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
+
+        {query && data && (
+          <p className="text-xs text-muted-foreground">
+            {filtered.length} résultat{filtered.length > 1 ? "s" : ""} sur{" "}
+            {data.total}
+          </p>
+        )}
 
         {isLoading && (
           <div className="flex items-center justify-center gap-2 p-12 text-muted-foreground">
@@ -91,9 +125,18 @@ export default function DevisListPage() {
           </div>
         )}
 
-        {data && data.data.length > 0 && (
+        {data && data.data.length > 0 && filtered.length === 0 && (
+          <div className="p-8 text-center rounded-xl border border-dashed bg-muted/30">
+            <p className="font-semibold">Aucun devis ne correspond à « {query} »</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Essaie un autre terme ou crée un nouveau devis.
+            </p>
+          </div>
+        )}
+
+        {data && filtered.length > 0 && (
           <div className="space-y-3">
-            {data.data.map((d: Devis) => {
+            {filtered.map((d: Devis) => {
               const b = statutBadge(d.statut);
               return (
                 <Link

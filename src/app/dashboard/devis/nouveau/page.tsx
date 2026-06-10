@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -66,6 +66,11 @@ function formatEuro(value: number) {
 export default function NouveauDevisPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  // Pré-remplissage depuis la page détail Client/Bateau
+  // (ex. /dashboard/devis/nouveau?clientId=xxx&bateauId=yyy)
+  const searchParams = useSearchParams();
+  const presetClientId = searchParams.get("clientId") ?? "";
+  const presetBateauId = searchParams.get("bateauId") ?? "";
 
   // Sélecteurs : client (obligatoire) + bateau (facultatif, filtré par client)
   const [clientSearch, setClientSearch] = useState("");
@@ -95,8 +100,8 @@ export default function NouveauDevisPage() {
   } = useForm<FormValues>({
     resolver: zodResolver(DevisSchema),
     defaultValues: {
-      clientId: "",
-      bateauId: "",
+      clientId: presetClientId,
+      bateauId: presetBateauId,
       description: "",
       tauxTVA: 20,
       dateValidite: defaultDateValidite(),

@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Wrench, Loader2, Anchor, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ListPageHeader } from "@/components/list-page-header";
+import { normalizeForSearch } from "@/lib/data/marques";
 import {
   api,
   type OrdreReparation,
@@ -73,9 +75,37 @@ function formatEuro(value: string | number) {
 }
 
 export default function OrListPage() {
+  const [query, setQuery] = useState("");
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["or"],
     queryFn: api.or.list,
+  });
+
+  // Filtrage côté client : type, mécano, n° devis, n° facture, bateau, client (accents ignorés)
+  const filtered = (data?.data ?? []).filter((or) => {
+    if (!query.trim()) return true;
+    const q = normalizeForSearch(query);
+    const bateauStr = or.devis?.bateau
+      ? normalizeForSearch(
+          `${or.devis.bateau.marque} ${or.devis.bateau.modele}`,
+        )
+      : "";
+    const clientStr = or.devis?.bateau?.client
+      ? normalizeForSearch(
+          `${or.devis.bateau.client.nom} ${or.devis.bateau.client.prenom}`,
+        )
+      : "";
+    return (
+      normalizeForSearch(typeLabel(or.type)).includes(q) ||
+      (or.mecano ? normalizeForSearch(or.mecano).includes(q) : false) ||
+      (or.description ? normalizeForSearch(or.description).includes(q) : false) ||
+      (or.devis ? normalizeForSearch(or.devis.numeroDevis).includes(q) : false) ||
+      (or.numeroFacture
+        ? normalizeForSearch(or.numeroFacture).includes(q)
+        : false) ||
+      bateauStr.includes(q) ||
+      clientStr.includes(q)
+    );
   });
 
   return (
@@ -94,9 +124,18 @@ export default function OrListPage() {
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-5">
         <Input
           type="search"
-          placeholder="Rechercher par bateau, client, mécano…"
+          placeholder="Rechercher par bateau, client, mécano, n° devis/facture…"
           className="h-12 text-base"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
+
+        {query && data && (
+          <p className="text-xs text-muted-foreground">
+            {filtered.length} résultat{filtered.length > 1 ? "s" : ""} sur{" "}
+            {data.total}
+          </p>
+        )}
 
         {isLoading && (
           <div className="flex items-center justify-center gap-2 p-12 text-muted-foreground">
@@ -121,9 +160,18 @@ export default function OrListPage() {
           </div>
         )}
 
-        {data && data.data.length > 0 && (
+        {data && data.data.length > 0 && filtered.length === 0 && (
+          <div className="p-8 text-center rounded-xl border border-dashed bg-muted/30">
+            <p className="font-semibold">Aucun OR ne correspond à « {query} »</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Essaie un autre terme.
+            </p>
+          </div>
+        )}
+
+        {data && filtered.length > 0 && (
           <div className="space-y-3">
-            {data.data.map((or: OrdreReparation) => {
+            {filtered.map((or: OrdreReparation) => {
               const s = statutBadge(or.statut);
               const u = urgenceBadge(or.urgence);
               return (

@@ -27,6 +27,9 @@ export type Client = {
   notes: string | null;
   createdAt: string;
   updatedAt: string;
+  // Présents uniquement sur GET /clients/:id (page détail)
+  bateaux?: Bateau[];
+  devis?: Devis[];
 };
 
 export type TypeCoque =
@@ -59,6 +62,8 @@ export type Bateau = {
   updatedAt: string;
   client?: Pick<Client, "id" | "nom" | "prenom">;
   _count?: { devis: number };
+  // Présent uniquement sur GET /bateaux/:id (page détail)
+  devis?: Devis[];
 };
 
 export type StatutDevis = "BROUILLON" | "ENVOYE" | "VALIDE" | "REFUSE";
@@ -88,7 +93,13 @@ export type Devis = {
     client?: Pick<Client, "id" | "nom" | "prenom">;
   } | null;
   /** OR créé automatiquement à la validation du devis. */
-  ordreReparation?: { id: string; statut: string } | null;
+  ordreReparation?: {
+    id: string;
+    statut: StatutOR;
+    numeroFacture?: string | null;
+    createdAt?: string;
+    mecano?: string | null;
+  } | null;
   _count?: { lignes: number };
 };
 
@@ -216,6 +227,7 @@ export const api = {
   },
   bateaux: {
     list: () => request<Paginated<Bateau>>("/bateaux"),
+    get: (id: string) => request<Bateau>(`/bateaux/${id}`),
     create: (input: CreateBateauInput) =>
       request<Bateau>("/bateaux", {
         method: "POST",

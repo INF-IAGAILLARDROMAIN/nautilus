@@ -46,9 +46,29 @@ export class ClientsService {
   }
 
   async findOne(id: string): Promise<Client> {
+    // Page détail Client : on inclut bateaux + devis (avec OR imbriqué).
+    // Les OR/factures sont dérivés côté front depuis devis.ordreReparation.
     const client = await this.prisma.client.findUnique({
       where: { id },
-      include: { bateaux: true },
+      include: {
+        bateaux: { orderBy: { createdAt: 'desc' } },
+        devis: {
+          orderBy: { createdAt: 'desc' },
+          include: {
+            bateau: { select: { id: true, nom: true, marque: true, modele: true } },
+            ordreReparation: {
+              select: {
+                id: true,
+                statut: true,
+                numeroFacture: true,
+                createdAt: true,
+                mecano: true,
+              },
+            },
+            _count: { select: { lignes: true } },
+          },
+        },
+      },
     });
     if (!client) {
       throw new NotFoundException(`Client ${id} introuvable`);

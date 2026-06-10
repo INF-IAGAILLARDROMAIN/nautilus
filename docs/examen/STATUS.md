@@ -2,7 +2,7 @@
 
 > Document **vivant** : mis à jour à chaque fin de session. Reflète l'état réel du code vs le périmètre figé dans [PRD-NAUTILUS-EXAMEN-V1.md](PRD-NAUTILUS-EXAMEN-V1.md).
 >
-> Dernière mise à jour : **2026-06-10** (matin — S1 bouclée : pages détail Client/Bateau + search bars branchées + pré-remplissage formulaires).
+> Dernière mise à jour : **2026-06-10 (soir)** — S2 quasi-bouclée en 1 journée : MongoDB Atlas + 3 PDFs (devis/OR/facture) avec mentions légales FR + Moteur IA Mistral avec fallback intelligent. Reste : déploiement Vercel + Railway.
 
 ---
 
@@ -11,7 +11,7 @@
 | Semaine | Mission PRD | Statut |
 |---|---|---|
 | S1 (02-08/06) | BDD + Auth + CRUD | ✅ **BOUCLÉE** (avec 2 jours de débord — 10/06) |
-| S2 (09-15/06) | Moteur de recherche IA + PDF + déploiement | 🟡 **DÉMARRAGE** (10/06) |
+| S2 (09-15/06) | Moteur de recherche IA + PDF + déploiement | 🟢 **70% BOUCLÉE EN 1 JOUR** (10/06) |
 | S3 (16-22/06) | Rédaction Dossier Projet + DP + 1er dépôt | ⏳ À venir |
 | S4 (23-28/06) | Diaporama + répétitions orales | ⏳ À venir |
 | **29/06** | 🎓 **Examen Villepinte** | 🎯 Objectif 16/20 min |
@@ -95,10 +95,10 @@
 ### S1 — Reste à faire (faible priorité)
 - ❌ **Formulaires édition + suppression** (mutations UPDATE/DELETE — V1 manuelle par appels API, UI à venir si temps)
 
-### S2 — EN COURS (démarrage 10/06)
-- ❌ **🌟 Moteur de recherche IA** en langage naturel (cœur examen, fonctionnalité signature)
-- ❌ **MongoDB Atlas** (historique des recherches IA — exigence SQL+NoSQL du référentiel)
-- ❌ **Génération PDF** côté serveur (devis + facture, pdfkit/puppeteer)
+### S2 — Reste à faire (10-15/06)
+- ✅ ~~Moteur de recherche IA~~ → **Fait le 10/06** (Mistral + 10 intents + fallback intelligent)
+- ✅ ~~MongoDB Atlas~~ → **Fait le 10/06** (cluster Paris + module RechercheLog)
+- ✅ ~~Génération PDF~~ → **Fait le 10/06** (devis/OR/facture avec mentions légales FR)
 - ❌ **Déploiement** Vercel (front) + Railway (back) — _attention : pas de Vercel avant validation Romain_
 
 ### S3-S4
@@ -123,11 +123,26 @@
 
 ## 🎯 Priorités pour les prochaines sessions
 
-1. **🌟 Moteur IA** — endpoint NestJS `RechercheIA` + intégration LLM (Mistral/Anthropic) (S2 — cœur examen)
-2. **MongoDB Atlas** — cluster gratuit pour historique des recherches IA (exigence SQL+NoSQL référentiel)
-3. **Génération PDF** — pdfkit ou puppeteer côté back (S2)
-4. **Déploiement** — Vercel front + Railway back (S2/S3, après validation Romain)
-5. **Dossier Projet** + DP — rédaction (S3)
+1. **🚀 Déploiement** — Vercel front + Railway back (V1 publique, après validation Romain) — la dernière marche S2
+2. **Dossier Projet + DP** — rédaction (S3, du 16/06 au 22/06)
+3. **Diaporama soutenance** + répétitions (S4)
+4. **Mineurs / nice-to-have** : UI édition/suppression entités, polissage prompt IA, observabilité
+
+## 🆕 Récap de la journée du 10/06
+
+Une journée d'exception qui a bouclé S1 + la quasi-totalité de S2 :
+
+- **Matin (S1)** — Pages détail Client/Bateau, 5 filtres listes, pré-remplissage formulaires, avatar dynamique JWT Supabase
+- **Midi (S2.1)** — MongoDB Atlas Free Tier (cluster Paris eu-west-3, Module RechercheLog avec stats agrégées)
+- **Après-midi (S2.2)** — pdfkit + 3 PDFs (devis, OR, facture) avec mentions RGPD + zone signature + footer SIRET
+- **Soir (S2.3)** — Moteur IA Mistral V1 : compte Free Tier, 10 intents typés, fallback intelligent métier (relâche statut filter si 0 résultat), prompt FR strict
+
+5 commits propres :
+- `e3c82d6` feat(s1): pages détail Client/Bateau + filtres listes + pré-remplissage forms
+- `d6bfd2b` feat(s2): MongoDB Atlas + génération PDF devis/OR/facture
+- `5044f40` feat(ia): moteur de recherche IA en langage naturel (Mistral + intent dispatch)
+- `3f395ab` fix(ia): ajout intents find_or_by_client + find_facture_by_client
+- `8c9a7da` feat(ia): fallback intelligent quand 0 résultat + statut filter
 
 ---
 
@@ -135,13 +150,17 @@
 
 | Bloc | Avancement |
 |---|---|
-| Backend | 🟢🟢🟢🟢🟢🟢🟢🟢🟢⚪ **90 %** (manque génération PDF + endpoint recherche IA) |
-| Frontend | 🟢🟢🟢🟢🟢🟢🟢🟢⚪⚪ **80 %** (lecture + auth + CUD + détails + navigation OK · reste UI édition/suppression + agent IA) |
+| Backend | 🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢 **100 %** ⭐ (MongoDB + PDF + Moteur IA Mistral 10 intents bouclés) |
+| Frontend | 🟢🟢🟢🟢🟢🟢🟢🟢🟢⚪ **90 %** (CUD + détails + navigation + recherche IA OK · reste UI édition/suppression mineurs) |
 | Sécurité | 🟢🟢🟢🟢🟢🟢🟢🟢🟢⚪ **95 %** ⭐ (front auth ✅ + back JWT ✅ + JWKS ES256 ✅, reste : rotater Secret Key + observabilité) |
+| Multi-BDD (SQL+NoSQL) | 🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢 **100 %** ⭐ (PostgreSQL Neon + MongoDB Atlas + log IA fonctionnel) |
+| Génération PDF | 🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢 **100 %** ⭐ (3 docs : devis/OR/facture avec mentions légales FR + RGPD + signature) |
+| Moteur IA | 🟢🟢🟢🟢🟢🟢🟢🟢🟢⚪ **90 %** ⭐ (Mistral + 10 intents + fallback intelligent · reste polissage prompt selon retours) |
+| Déploiement | ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪ **0 %** (Vercel + Railway à venir) |
 | Documentation examen | 🟢🟢🟢⚪⚪⚪⚪⚪⚪⚪ **30 %** (PRD ok, Dossier Projet à rédiger) |
 | Démo orale | ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪ **0 %** |
 
-> **Avancement global : ~65 %** — S1 bouclée, S2 démarre. Auth bout en bout + navigation profonde = 2 gros jalons franchis.
+> **Avancement global : ~80 %** — toutes les fonctionnalités cœur examen sont en place. Reste le déploiement (1-2h) puis la rédaction Dossier Projet + DP (S3) + diaporama (S4).
 
 ---
 

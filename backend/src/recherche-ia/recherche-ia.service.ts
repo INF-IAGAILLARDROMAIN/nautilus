@@ -29,6 +29,8 @@ import { RechercheLogService } from '../recherche-log/recherche-log.service';
 type IntentName =
   | 'find_bateau_by_client'
   | 'find_devis_by_client'
+  | 'find_or_by_client'
+  | 'find_facture_by_client'
   | 'list_or_by_statut'
   | 'list_or_urgents'
   | 'find_facture_by_numero'
@@ -207,6 +209,8 @@ export class RechercheIaService {
     const intentsValides: IntentName[] = [
       'find_bateau_by_client',
       'find_devis_by_client',
+      'find_or_by_client',
+      'find_facture_by_client',
       'list_or_by_statut',
       'list_or_urgents',
       'find_facture_by_numero',
@@ -237,6 +241,15 @@ export class RechercheIaService {
 
       case 'find_devis_by_client':
         return this.findDevisByClient(entities.client_name ?? '');
+
+      case 'find_or_by_client':
+        return this.findOrByClient(
+          entities.client_name ?? '',
+          entities.statut ?? '',
+        );
+
+      case 'find_facture_by_client':
+        return this.findFactureByClient(entities.client_name ?? '');
 
       case 'list_or_by_statut':
         return this.listOrByStatut(entities.statut ?? '');
@@ -290,6 +303,75 @@ export class RechercheIaService {
       include: {
         client: { select: { id: true, nom: true, prenom: true } },
         bateau: { select: { id: true, marque: true, modele: true, nom: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+  }
+
+  private async findOrByClient(name: string, statut: string) {
+    if (!name.trim()) return [];
+    const mapping: Record<string, 'CREE' | 'EN_COURS' | 'TERMINE' | 'FACTURE'> =
+      {
+        cree: 'CREE',
+        crée: 'CREE',
+        nouveau: 'CREE',
+        en_cours: 'EN_COURS',
+        'en cours': 'EN_COURS',
+        encours: 'EN_COURS',
+        termine: 'TERMINE',
+        terminé: 'TERMINE',
+        fini: 'TERMINE',
+        facture: 'FACTURE',
+        facturé: 'FACTURE',
+      };
+    const statutFiltre = mapping[statut.toLowerCase().trim()];
+    return this.prisma.ordreReparation.findMany({
+      where: {
+        ...(statutFiltre && { statut: statutFiltre }),
+        devis: {
+          client: {
+            OR: [
+              { nom: { contains: name, mode: 'insensitive' } },
+              { prenom: { contains: name, mode: 'insensitive' } },
+            ],
+          },
+        },
+      },
+      include: {
+        devis: {
+          include: {
+            client: { select: { id: true, nom: true, prenom: true } },
+            bateau: { select: { id: true, marque: true, modele: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+  }
+
+  private async findFactureByClient(name: string) {
+    if (!name.trim()) return [];
+    return this.prisma.ordreReparation.findMany({
+      where: {
+        statut: 'FACTURE',
+        devis: {
+          client: {
+            OR: [
+              { nom: { contains: name, mode: 'insensitive' } },
+              { prenom: { contains: name, mode: 'insensitive' } },
+            ],
+          },
+        },
+      },
+      include: {
+        devis: {
+          include: {
+            client: { select: { id: true, nom: true, prenom: true } },
+            bateau: { select: { id: true, marque: true, modele: true } },
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
       take: 20,
@@ -414,33 +496,50 @@ Liste des intents :
    entities: { "client_name": "Martin" }
    Exemples : "devis de Martin", "tous les devis de Sophie Dupont"
 
-3. "list_or_by_statut" — lister les OR (ordres de réparation) par statut.
+3. "find_or_by_client" — trouver les OR d'un client (statut optionnel).
+   entities: { "client_name": "Martin", "statut": "EN_COURS" }
+   Le champ "statut" est OPTIONNEL — laisse-le vide si non précisé.
+   Exemples : "OR de Martin", "les réparations en cours de Sophie",
+              "tous les OR de Dupont", "qu'est-ce qu'il y a sur le bateau de Martin"
+
+4. "find_facture_by_client" — trouver les factures d'un client.
+   entities: { "client_name": "Martin" }
+   Exemples : "factures de Martin", "ce que Sophie a payé", "factures de Dupont"
+
+5. "list_or_by_statut" — lister TOUS les OR par statut (pas filtré par client).
    entities: { "statut": "EN_COURS" | "CREE" | "TERMINE" | "FACTURE" }
    Exemples : "OR en cours", "réparations terminées", "ordres facturés"
+   ⚠ N'utilise CET intent que si AUCUN nom de client n'est mentionné.
+   Sinon, utilise "find_or_by_client".
 
-4. "list_or_urgents" — lister les OR urgents non encore facturés.
+6. "list_or_urgents" — lister les OR urgents non encore facturés.
    entities: {}
    Exemples : "OR urgents", "réparations urgentes", "qu'est-ce qui presse"
 
-5. "find_facture_by_numero" — trouver une facture par son numéro.
+7. "find_facture_by_numero" — trouver une facture par son numéro.
    entities: { "numero": "FAC-2026-0001" }
    Exemples : "facture FAC-2026-0001", "facture numéro 0042"
 
-6. "list_recent_devis" — lister les derniers devis créés.
+8. "list_recent_devis" — lister les derniers devis créés.
    entities: {}
    Exemples : "derniers devis", "devis récents", "devis du mois"
 
-7. "stats_global" — compter les entités (clients, bateaux, devis, OR, factures).
+9. "stats_global" — compter les entités (clients, bateaux, devis, OR, factures).
    entities: {}
    Exemples : "combien de clients", "stats globales", "résumé de l'atelier"
 
-8. "fallback" — utilisé UNIQUEMENT si la question ne correspond à aucun intent.
-   entities: {}
-   explanation : "Je n'ai pas compris ta question, peux-tu reformuler ?"
+10. "fallback" — utilisé UNIQUEMENT si la question ne correspond à aucun intent.
+    entities: {}
+    explanation : "Je n'ai pas compris ta question, peux-tu reformuler ?"
 
 Règles strictes :
 - TOUJOURS renvoyer un JSON valide.
 - Le champ "intent" doit être EXACTEMENT une des valeurs ci-dessus.
 - Si tu hésites entre deux intents, choisis celui qui maximise l'utilité métier.
+- "fallback" est un dernier recours — préfère TOUJOURS un intent thématique si
+  un nom de client OU un statut OU un type d'objet (devis, OR, facture, bateau)
+  est mentionné dans la question.
+- Tolère les fautes d'orthographe ("en cour" = "en cours", "factur" = "facture",
+  "ordre" / "OR" = ordre de réparation) et les contractions du langage parlé.
 - Les noms de clients dans "client_name" doivent être en français normal (pas en majuscules).
 - Ne génère AUCUN texte hors du JSON.`;

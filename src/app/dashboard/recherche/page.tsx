@@ -425,6 +425,8 @@ function RecherchePageInner() {
 
             {(data.intent === "list_or_by_statut" ||
               data.intent === "list_or_urgents" ||
+              data.intent === "find_or_by_client" ||
+              data.intent === "find_facture_by_client" ||
               data.intent === "find_facture_by_numero") && (
               <RenduOrs items={data.resultats as ResultatOr[]} />
             )}

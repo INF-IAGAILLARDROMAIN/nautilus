@@ -13,8 +13,8 @@ import { BateauxModule } from './bateaux/bateaux.module';
 import { DevisModule } from './devis/devis.module';
 import { OrdreReparationModule } from './ordre-reparation/ordre-reparation.module';
 import { RechercheLogModule } from './recherche-log/recherche-log.module';
+import { RechercheIaModule } from './recherche-ia/recherche-ia.module';
 // Modules à brancher au fur et à mesure :
-// import { RechercheIaModule } from './recherche-ia/recherche-ia.module';
 // import { PdfModule } from './pdf/pdf.module';
 
 @Module({
@@ -56,7 +56,7 @@ import { RechercheLogModule } from './recherche-log/recherche-log.module';
     OrdreReparationModule, // doit être déclaré AVANT DevisModule (DevisModule en dépend)
     DevisModule,
     RechercheLogModule,
-    // RechercheIaModule,
+    RechercheIaModule,
     // PdfModule,
   ],
   controllers: [AppController],

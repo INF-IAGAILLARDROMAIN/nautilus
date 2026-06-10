@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   Anchor,
@@ -86,10 +87,19 @@ function extractIdentity(user: {
 // des pages Devis / OR / Factures (toutes branchées API, plus aucun mock).
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [question, setQuestion] = useState("");
   const [identity, setIdentity] = useState<{
     firstName: string;
     initials: string;
   }>({ firstName: "", initials: "…" });
+
+  function handleAsk(e: React.FormEvent) {
+    e.preventDefault();
+    const q = question.trim();
+    if (q.length < 2) return;
+    router.push(`/dashboard/recherche?q=${encodeURIComponent(q)}`);
+  }
 
   useEffect(() => {
     const supabase = createClient();
@@ -162,18 +172,30 @@ export default function DashboardPage() {
             Pose ta question en français, l&apos;assistant interroge la base
             pour toi.
           </p>
-          <div className="relative">
+          <form onSubmit={handleAsk} className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
             <Input
               type="search"
-              placeholder="« bateau de Martin », « OR en cours », « devis impayés »…"
-              className="pl-11 h-14 text-base"
-              disabled
+              placeholder="« bateau de Martin », « OR en cours », « combien de clients »…"
+              className="pl-11 pr-24 h-14 text-base"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              autoFocus
+              minLength={2}
+              maxLength={500}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider font-bold text-muted-foreground bg-muted px-2 py-1 rounded">
-              Bientôt
-            </span>
-          </div>
+            <Button
+              type="submit"
+              size="sm"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-10"
+              disabled={question.trim().length < 2}
+            >
+              Demander
+            </Button>
+          </form>
+          <p className="text-[11px] text-muted-foreground mt-2 italic">
+            Propulsé par Mistral · IA souveraine française · {"data hébergée à Paris"}
+          </p>
         </section>
 
         {/* Carte unique Clients — entité racine du modèle métier

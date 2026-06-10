@@ -308,4 +308,38 @@ export const api = {
     // Une facture = un OR au statut FACTURE.
     list: () => request<Paginated<OrdreReparation>>("/or?statut=FACTURE"),
   },
+  recherche: {
+    /** Pose une question en langage naturel à l'agent IA Mistral. */
+    ask: (question: string) =>
+      request<RechercheResultat>("/recherche", {
+        method: "POST",
+        body: JSON.stringify({ question }),
+      }),
+  },
+};
+
+// -----------------------------------------------------------------------------
+// Types du moteur de recherche IA
+// -----------------------------------------------------------------------------
+
+export type IntentRechercheIa =
+  | "find_bateau_by_client"
+  | "find_devis_by_client"
+  | "list_or_by_statut"
+  | "list_or_urgents"
+  | "find_facture_by_numero"
+  | "list_recent_devis"
+  | "stats_global"
+  | "fallback";
+
+export type RechercheResultat = {
+  question: string;
+  intent: IntentRechercheIa;
+  entities: Record<string, string>;
+  resultats: unknown; // shape variable selon intent
+  resultatsCount: number;
+  tempsMs: number;
+  llmProvider: string;
+  llmModele: string;
+  explanation?: string;
 };

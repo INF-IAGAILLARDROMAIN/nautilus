@@ -344,4 +344,6 @@ export type RechercheResultat = {
   llmProvider: string;
   llmModele: string;
   explanation?: string;
+  /** Message contextuel ajouté par le service quand il a fallback. */
+  messageInfo?: string;
 };

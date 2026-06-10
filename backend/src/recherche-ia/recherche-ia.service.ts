@@ -54,6 +54,12 @@ export interface RechercheResultat {
   llmProvider: string;
   llmModele: string;
   explanation?: string;
+  /**
+   * Message contextuel généré par le service quand il a fallback
+   * automatiquement (ex : "0 OR EN_COURS pour Martin — voici tous ses OR").
+   * Permet au front d'afficher un bandeau d'information.
+   */
+  messageInfo?: string;
 }
 
 @Injectable()
@@ -115,8 +121,32 @@ export class RechercheIaService {
     // 2. Dispatch sur l'intent → exécution Prisma
     let resultats: unknown = [];
     let statut: 'ok' | 'no_results' | 'sql_error' = 'ok';
+    let messageInfo: string | undefined;
+    let entitiesEffectives = llmResp.entities;
+
     try {
       resultats = await this.executerIntent(llmResp.intent, llmResp.entities);
+
+      // Fallback métier : si find_or_by_client avec statut → 0 résultat,
+      // on relâche le filtre statut et on prévient l'utilisateur.
+      // (Plus utile que "Aucun résultat" sec, et démontre l'intelligence du service.)
+      if (
+        Array.isArray(resultats) &&
+        resultats.length === 0 &&
+        llmResp.intent === 'find_or_by_client' &&
+        llmResp.entities.statut?.trim()
+      ) {
+        const sansStatut = await this.executerIntent('find_or_by_client', {
+          client_name: llmResp.entities.client_name ?? '',
+        });
+        if (Array.isArray(sansStatut) && sansStatut.length > 0) {
+          resultats = sansStatut;
+          entitiesEffectives = {
+            client_name: llmResp.entities.client_name ?? '',
+          };
+          messageInfo = `Aucun OR au statut « ${llmResp.entities.statut} » pour ce client — voici tous ses OR (${sansStatut.length}).`;
+        }
+      }
     } catch (e) {
       statut = 'sql_error';
       this.logger.error(
@@ -147,13 +177,14 @@ export class RechercheIaService {
     return {
       question,
       intent: llmResp.intent,
-      entities: llmResp.entities,
+      entities: entitiesEffectives,
       resultats,
       resultatsCount,
       tempsMs,
       llmProvider: 'mistral',
       llmModele: this.modele,
       explanation: llmResp.explanation,
+      messageInfo,
     };
   }
 

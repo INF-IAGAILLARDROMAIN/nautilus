@@ -392,6 +392,14 @@ function RecherchePageInner() {
               )}
             </div>
 
+            {/* Bandeau "j'ai élargi la recherche pour toi" */}
+            {data.messageInfo && (
+              <div className="p-3 rounded-xl border border-chart-4/40 bg-chart-4/10 text-sm">
+                <span className="font-bold">💡 </span>
+                {data.messageInfo}
+              </div>
+            )}
+
             {/* Résultats selon intent */}
             {data.resultatsCount === 0 && data.intent !== "fallback" && (
               <div className="p-8 text-center rounded-xl border border-dashed bg-muted/30">

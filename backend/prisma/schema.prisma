@@ -108,7 +108,7 @@ model Bateau {
   notes           String?    @db.Text
 
   // === MOTORISATION (V1 : 1 moteur par bateau dans la même table) ===
-  // V2 RANKIA prévue : extraire en entité Moteur séparée avec relation 1:N
+  // V2 prévue : extraire en entité Moteur séparée avec relation 1:N
   // pour supporter la multi-motorisation native (bi, tri, quadri…).
   /// Marque du moteur (Yamaha, Suzuki, Mercury, Evinrude…).
   marqueMoteur    String?

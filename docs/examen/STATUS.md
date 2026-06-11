@@ -2,7 +2,7 @@
 
 > Document **vivant** : mis à jour à chaque fin de session. Reflète l'état réel du code vs le périmètre figé dans [PRD-NAUTILUS-EXAMEN-V1.md](PRD-NAUTILUS-EXAMEN-V1.md).
 >
-> Dernière mise à jour : **2026-06-10 (soir)** — S2 quasi-bouclée en 1 journée : MongoDB Atlas + 3 PDFs (devis/OR/facture) avec mentions légales FR + Moteur IA Mistral avec fallback intelligent. Reste : déploiement Vercel + Railway.
+> Dernière mise à jour : **2026-06-11 (après-midi)** — S2 quasi-terminée : back NestJS déployé en prod sur Railway (Europe-West, latence ~40 ms) + nettoyage repo + tests Jest. Reste : déploiement Vercel front + rédaction sections DP en S3.
 
 ---
 
@@ -11,7 +11,7 @@
 | Semaine | Mission PRD | Statut |
 |---|---|---|
 | S1 (02-08/06) | BDD + Auth + CRUD | ✅ **BOUCLÉE** (avec 2 jours de débord — 10/06) |
-| S2 (09-15/06) | Moteur de recherche IA + PDF + déploiement | 🟢 **70% BOUCLÉE EN 1 JOUR** (10/06) |
+| S2 (09-15/06) | Moteur de recherche IA + PDF + déploiement | 🟢 **90% BOUCLÉE** (back Railway en prod le 11/06) |
 | S3 (16-22/06) | Rédaction Dossier Projet + DP + 1er dépôt | ⏳ À venir |
 | S4 (23-28/06) | Diaporama + répétitions orales | ⏳ À venir |
 | **29/06** | 🎓 **Examen Villepinte** | 🎯 Objectif 16/20 min |
@@ -156,11 +156,12 @@ Une journée d'exception qui a bouclé S1 + la quasi-totalité de S2 :
 | Multi-BDD (SQL+NoSQL) | 🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢 **100 %** ⭐ (PostgreSQL Neon + MongoDB Atlas + log IA fonctionnel) |
 | Génération PDF | 🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢 **100 %** ⭐ (3 docs : devis/OR/facture avec mentions légales FR + RGPD + signature) |
 | Moteur IA | 🟢🟢🟢🟢🟢🟢🟢🟢🟢⚪ **90 %** ⭐ (Mistral + 10 intents + fallback intelligent · reste polissage prompt selon retours) |
-| Déploiement | ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪ **0 %** (Vercel + Railway à venir) |
-| Documentation examen | 🟢🟢🟢⚪⚪⚪⚪⚪⚪⚪ **30 %** (PRD ok, Dossier Projet à rédiger) |
-| Démo orale | ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪ **0 %** |
+| Déploiement | 🟢🟢🟢🟢🟢⚪⚪⚪⚪⚪ **50 %** (back NestJS en prod Railway Europe-West 11/06, front Vercel à venir) |
+| Tests | 🟢🟢🟢🟢⚪⚪⚪⚪⚪⚪ **40 %** (Jest 9/9 sur clients/devis/PDF + test-workflow.sh E2E, reste tests front Vitest) |
+| Documentation examen | 🟢🟢🟢🟢🟢⚪⚪⚪⚪⚪ **50 %** (PRD ok, ORAL-ARGUMENTS 60+ items, 4 sections DP à compléter en S3) |
+| Démo orale | ⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪ **0 %** (S4) |
 
-> **Avancement global : ~80 %** — toutes les fonctionnalités cœur examen sont en place. Reste le déploiement (1-2h) puis la rédaction Dossier Projet + DP (S3) + diaporama (S4).
+> **Avancement global : ~85 %** — back en prod sur Railway, front prêt à déployer Vercel, repo nettoyé et tests Jest verts. Reste : déploiement Vercel (≈30 min) + rédaction sections DP (S3 16-22/06) + diaporama (S4).
 
 ---
 

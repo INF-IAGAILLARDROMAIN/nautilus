@@ -181,7 +181,7 @@ export class PdfService {
       .font('Helvetica')
       .text('Atelier nautique — Spécialiste hors-bord', 40, 65)
       .text('Port de plaisance · 56690 Landévant', 40, 78)
-      .text('contact@nautilus.atelier · 06 35 25 10 30', 40, 91);
+      .text('contact@nautilus.atelier · 06 XX XX XX XX', 40, 91);
 
     // Numéro de document à droite
     doc

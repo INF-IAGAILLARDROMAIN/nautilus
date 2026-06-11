@@ -156,7 +156,7 @@ Tous les badges suivent un code couleur **cohérent** dans l'app :
 
 ## 5. Iconographie
 
-**Set choisi : Lucide React** *(même que Vite & Gourmand et Kosmos/ING+, cohérence INF-IA)*
+**Set choisi : Lucide React** *(set d'icônes open source moderne, tree-shakable, parfaitement intégré au design system shadcn/ui)*
 
 Règles :
 - Taille standard : **24px** (mobile + desktop)

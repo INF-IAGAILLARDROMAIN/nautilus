@@ -21,8 +21,8 @@ import { api, type CreateClientInput } from "@/lib/api";
 // La BDD supporte PARTICULIER et PROFESSIONNEL (enum TypeClient).
 // Le formulaire V1 ne propose QUE le particulier (default Prisma).
 // Le PRO nécessite raison sociale + SIRET + N° TVA + facturation B2B,
-// prévu en V2 commerciale RANKIA (pattern d'affichage conditionnel déjà
-// implémenté sur le formulaire de contact Kosmos).
+// prévu en V2 (pattern d'affichage conditionnel déjà implémenté
+// sur le formulaire de contact Kosmos).
 const ClientSchema = z.object({
   nom: z.string().min(2, "Le nom doit faire au moins 2 caractères"),
   prenom: z.string().min(2, "Le prénom doit faire au moins 2 caractères"),

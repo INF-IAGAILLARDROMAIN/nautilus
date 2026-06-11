@@ -1,0 +1,5 @@
+# Nautilus est un outil interne d'atelier nautique, pas un site public.
+# On bloque toute indexation par les moteurs de recherche.
+
+User-agent: *
+Disallow: /

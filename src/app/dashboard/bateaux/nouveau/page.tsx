@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -24,7 +24,7 @@ import { api, type CreateBateauInput, type TypeCoque } from "@/lib/api";
 //
 // Périmètre V1 — Modélisation simple "Option A" :
 // Bateau + Moteur dans la même table (1 moteur par bateau).
-// La V2 RANKIA prévoit une entité Moteur séparée avec relation 1:N
+// La V2 prévoit une entité Moteur séparée avec relation 1:N
 // (bi/tri/quadri-motorisation, scan de plaque, décodage Yamaha/Suzuki).
 const BateauSchema = z.object({
   clientId: z.string().min(1, "Sélectionne un propriétaire"),
@@ -33,18 +33,16 @@ const BateauSchema = z.object({
   nom: z.string().max(60).optional(),
   marque: z.string().min(2, "Marque requise"),
   modele: z.string().min(1, "Modèle requis"),
-  typeCoque: z
-    .enum([
-      "STRATIFIE",
-      "ALUMINIUM",
-      "POLYETHYLENE",
-      "SEMI_RIGIDE",
-      "PNEUMATIQUE",
-      "BOIS",
-      "ACIER",
-      "AUTRE",
-    ])
-    .default("STRATIFIE"),
+  typeCoque: z.enum([
+    "STRATIFIE",
+    "ALUMINIUM",
+    "POLYETHYLENE",
+    "SEMI_RIGIDE",
+    "PNEUMATIQUE",
+    "BOIS",
+    "ACIER",
+    "AUTRE",
+  ]),
   immatriculation: z.string().max(20).optional(),
   annee: z
     .union([
@@ -82,7 +80,9 @@ const TYPES_COQUE: { value: TypeCoque; label: string; hint: string }[] = [
   { value: "AUTRE", label: "Autre", hint: "À préciser dans les notes" },
 ];
 
-export default function NouveauBateauPage() {
+// useSearchParams() est appelé dans le composant pour lire ?clientId=...
+// Il doit être wrappé dans une <Suspense> (contrainte Next.js App Router).
+function NouveauBateauPageInner() {
   const router = useRouter();
   const queryClient = useQueryClient();
   // Pré-remplissage depuis la page détail Client
@@ -105,7 +105,9 @@ export default function NouveauBateauPage() {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(BateauSchema),
+    // Cast nécessaire : Zod v3 et react-hook-form ont un mismatch de types
+    // sur les unions/coerce, alors qu'au runtime la résolution fonctionne.
+    resolver: zodResolver(BateauSchema) as unknown as Resolver<FormValues>,
     defaultValues: {
       clientId: presetClientId,
       nom: "",
@@ -543,5 +545,13 @@ function Field({
       )}
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
+  );
+}
+
+export default function NouveauBateauPage() {
+  return (
+    <Suspense fallback={null}>
+      <NouveauBateauPageInner />
+    </Suspense>
   );
 }

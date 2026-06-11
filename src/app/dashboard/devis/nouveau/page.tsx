@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -63,7 +63,9 @@ function formatEuro(value: number) {
   });
 }
 
-export default function NouveauDevisPage() {
+// useSearchParams() est appelé dans le composant pour lire ?clientId=...&bateauId=...
+// Il doit être wrappé dans une <Suspense> (contrainte Next.js App Router).
+function NouveauDevisPageInner() {
   const router = useRouter();
   const queryClient = useQueryClient();
   // Pré-remplissage depuis la page détail Client/Bateau
@@ -98,7 +100,9 @@ export default function NouveauDevisPage() {
     control,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(DevisSchema),
+    // Cast nécessaire : Zod v3 et react-hook-form ont un mismatch de types
+    // sur les unions/coerce, alors qu'au runtime la résolution fonctionne.
+    resolver: zodResolver(DevisSchema) as unknown as Resolver<FormValues>,
     defaultValues: {
       clientId: presetClientId,
       bateauId: presetBateauId,
@@ -832,5 +836,13 @@ function Field({
       )}
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
+  );
+}
+
+export default function NouveauDevisPage() {
+  return (
+    <Suspense fallback={null}>
+      <NouveauDevisPageInner />
+    </Suspense>
   );
 }

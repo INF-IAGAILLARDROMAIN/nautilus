@@ -1,0 +1,19 @@
+# Exclusions Vercel — on déploie uniquement le front Next.js
+
+# Backend NestJS (déployé séparément sur Railway)
+backend/
+
+# Documentation projet (non nécessaire au runtime front)
+docs/
+
+# Tests et scripts shell
+*.test.ts
+*.spec.ts
+test-*.sh
+
+# Fichiers macOS
+.DS_Store
+
+# Notes locales Claude (déjà gitignored, ceinture + bretelles)
+CLAUDE.md
+AGENTS.md

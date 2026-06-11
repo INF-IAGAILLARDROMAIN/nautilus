@@ -1,6 +1,15 @@
 {
   "name": "nautilus",
   "version": "0.1.0",
+  "description": "Application web de gestion d'atelier nautique avec moteur de recherche en langage naturel (Mistral) — projet TP DWWM Studi 2026.",
+  "author": "Romain Gaillard",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/INF-IAGAILLARDROMAIN/nautilus"
+  },
+  "homepage": "https://github.com/INF-IAGAILLARDROMAIN/nautilus#readme",
+  "keywords": ["nautique", "atelier", "saas", "next.js", "nestjs", "mistral-ai", "tp-dwwm"],
   "private": true,
   "scripts": {
     "dev": "next dev",

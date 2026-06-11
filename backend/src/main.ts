@@ -11,9 +11,16 @@ async function bootstrap(): Promise<void> {
   // Sécurité — headers HTTP
   app.use(helmet());
 
-  // CORS — strict, origine front uniquement
+  // CORS — strict, origines front uniquement.
+  // CORS_ORIGIN peut contenir plusieurs origines séparées par des virgules
+  // (ex: "https://nautilus-silk.vercel.app,http://localhost:3000") — on splitte
+  // pour que le navigateur reçoive UNE SEULE origine en réponse (RFC CORS).
+  const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:3000')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
   app.enableCors({
-    origin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
+    origin: corsOrigins,
     credentials: true,
   });
 

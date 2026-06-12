@@ -1176,7 +1176,7 @@ LISTE DES INTENTS (19)
     Au moins un des deux requis.
     Exemples :
     - "client au 06.12.34.56"     → telephone: "0612345678"
-    - "client rgaillard@inf-ia"   → email: "rgaillard@inf-ia"
+    - "client jean@dupont.fr"     → email: "jean@dupont.fr"
 
 13. "find_bateau_by_plaque_moteur" — bateau par N° plaque/série moteur.
     entities: { "plaque": "F2T123456" }

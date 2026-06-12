@@ -323,7 +323,8 @@ export const api = {
 // -----------------------------------------------------------------------------
 
 export type IntentRechercheIa =
-  | "find_bateau_by_client"
+  // Métier (15)
+  | "find_bateau"
   | "find_devis_by_client"
   | "find_or_by_client"
   | "find_facture_by_client"
@@ -331,8 +332,19 @@ export type IntentRechercheIa =
   | "list_or_urgents"
   | "find_facture_by_numero"
   | "list_recent_devis"
+  | "list_recent_factures"
+  | "list_bateaux_by_moteur"
+  | "list_or_by_periode"
+  | "find_client_by_contact"
+  | "find_bateau_by_plaque_moteur"
   | "stats_global"
-  | "fallback";
+  | "fallback"
+  // UX (3)
+  | "salutation"
+  | "help"
+  | "hors_domaine"
+  // Sécurité (1)
+  | "securite_refus";
 
 export type RechercheResultat = {
   question: string;

@@ -17,6 +17,10 @@ import {
   Sparkles,
   ChevronRight,
   Clock,
+  ShieldAlert,
+  HelpCircle,
+  Hand,
+  CircleHelp,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -75,6 +79,15 @@ type StatsGlobal = {
   devis: number;
   ors: number;
   factures: number;
+};
+
+type ResultatClient = {
+  id: string;
+  nom: string;
+  prenom: string;
+  email: string | null;
+  telephone: string | null;
+  ville: string | null;
 };
 
 function RenduBateaux({ items }: { items: ResultatBateau[] }) {
@@ -221,6 +234,57 @@ function RenduOrs({ items }: { items: ResultatOr[] }) {
   );
 }
 
+function RenduClients({ items }: { items: ResultatClient[] }) {
+  if (items.length === 0) return null;
+  return (
+    <div className="space-y-2">
+      {items.map((c) => (
+        <Link
+          key={c.id}
+          href={`/dashboard/clients/${c.id}`}
+          className="flex items-center gap-3 p-4 rounded-xl bg-card border hover:bg-muted/30 transition"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-chart-2 text-white">
+            <User className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-bold leading-tight">
+              <span className="uppercase">{c.nom}</span> {c.prenom}
+            </p>
+            {c.telephone && (
+              <p className="text-sm text-muted-foreground">📞 {c.telephone}</p>
+            )}
+            {c.email && (
+              <p className="text-xs text-muted-foreground truncate">
+                ✉ {c.email}
+              </p>
+            )}
+            {c.ville && (
+              <p className="text-xs text-muted-foreground">📍 {c.ville}</p>
+            )}
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+function RenduHelpExemples({ examples }: { examples: string[] }) {
+  return (
+    <div className="space-y-2">
+      {examples.map((ex, i) => (
+        <div
+          key={i}
+          className="p-3 rounded-xl border bg-card flex items-center gap-3 text-sm"
+        >
+          {ex}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function RenduStats({ stats }: { stats: StatsGlobal }) {
   const items = [
     { label: "Clients", value: stats.clients, icon: Users, color: "bg-primary" },
@@ -243,6 +307,77 @@ function RenduStats({ stats }: { stats: StatsGlobal }) {
           <p className="text-xs text-muted-foreground">{label}</p>
         </div>
       ))}
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Bandeau messageInfo — style et icône selon l'intent
+// -----------------------------------------------------------------------------
+
+import type { IntentRechercheIa } from "@/lib/api";
+
+const DATA_INTENTS: ReadonlyArray<IntentRechercheIa> = [
+  "find_bateau",
+  "find_devis_by_client",
+  "find_or_by_client",
+  "find_facture_by_client",
+  "list_or_by_statut",
+  "list_or_urgents",
+  "find_facture_by_numero",
+  "list_recent_devis",
+  "list_recent_factures",
+  "list_bateaux_by_moteur",
+  "list_or_by_periode",
+  "find_client_by_contact",
+  "find_bateau_by_plaque_moteur",
+  "stats_global",
+];
+
+function isDataIntent(intent: IntentRechercheIa): boolean {
+  return DATA_INTENTS.includes(intent);
+}
+
+function MessageInfo({
+  intent,
+  message,
+}: {
+  intent: IntentRechercheIa;
+  message: string;
+}) {
+  // Style + icône selon la nature du message
+  let classes = "border-chart-4/40 bg-chart-4/10 text-foreground";
+  let Icon = CircleHelp;
+  let iconColor = "text-chart-4";
+
+  if (intent === "securite_refus") {
+    classes = "border-destructive bg-destructive/10 text-destructive";
+    Icon = ShieldAlert;
+    iconColor = "text-destructive";
+  } else if (intent === "hors_domaine") {
+    classes = "border-chart-4/40 bg-chart-4/10 text-foreground";
+    Icon = HelpCircle;
+    iconColor = "text-chart-4";
+  } else if (intent === "salutation") {
+    classes = "border-chart-2/40 bg-chart-2/10 text-foreground";
+    Icon = Hand;
+    iconColor = "text-chart-2";
+  } else if (intent === "help") {
+    classes = "border-primary/40 bg-primary/10 text-foreground";
+    Icon = Sparkles;
+    iconColor = "text-primary";
+  } else if (intent === "fallback") {
+    classes = "border-dashed bg-muted/30 text-foreground";
+    Icon = CircleHelp;
+    iconColor = "text-muted-foreground";
+  }
+
+  return (
+    <div
+      className={`p-4 rounded-xl border ${classes} flex items-start gap-3 text-sm`}
+    >
+      <Icon className={`h-5 w-5 shrink-0 mt-0.5 ${iconColor}`} />
+      <p className="flex-1">{message}</p>
     </div>
   );
 }
@@ -392,55 +527,63 @@ function RecherchePageInner() {
               )}
             </div>
 
-            {/* Bandeau "j'ai élargi la recherche pour toi" */}
+            {/* Bandeau messageInfo — style adapté à l'intent */}
             {data.messageInfo && (
-              <div className="p-3 rounded-xl border border-chart-4/40 bg-chart-4/10 text-sm">
-                <span className="font-bold">💡 </span>
-                {data.messageInfo}
-              </div>
+              <MessageInfo
+                intent={data.intent}
+                message={data.messageInfo}
+              />
             )}
 
-            {/* Résultats selon intent */}
-            {data.resultatsCount === 0 && data.intent !== "fallback" && (
-              <div className="p-8 text-center rounded-xl border border-dashed bg-muted/30">
-                <p className="font-semibold">Aucun résultat trouvé</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Essaie de reformuler ou élargir la question.
-                </p>
-              </div>
-            )}
+            {/* État "0 résultat" — uniquement pour intents qui interrogent la BDD */}
+            {data.resultatsCount === 0 &&
+              isDataIntent(data.intent) &&
+              !data.messageInfo && (
+                <div className="p-8 text-center rounded-xl border border-dashed bg-muted/30">
+                  <p className="font-semibold">Aucun résultat trouvé</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Essaie de reformuler ou élargir la question.
+                  </p>
+                </div>
+              )}
 
-            {data.intent === "fallback" && (
-              <div className="p-8 text-center rounded-xl border border-dashed bg-muted/30">
-                <p className="font-semibold">
-                  Je n&apos;ai pas compris la question
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Essaie : «&nbsp;bateau de [client]&nbsp;», «&nbsp;OR en
-                  cours&nbsp;», «&nbsp;combien de clients&nbsp;»
-                </p>
-              </div>
-            )}
-
-            {data.intent === "find_bateau_by_client" && (
+            {/* Bateaux */}
+            {(data.intent === "find_bateau" ||
+              data.intent === "find_bateau_by_plaque_moteur" ||
+              data.intent === "list_bateaux_by_moteur") && (
               <RenduBateaux items={data.resultats as ResultatBateau[]} />
             )}
 
+            {/* Devis */}
             {(data.intent === "find_devis_by_client" ||
               data.intent === "list_recent_devis") && (
               <RenduDevis items={data.resultats as ResultatDevis[]} />
             )}
 
+            {/* OR + Factures + Période */}
             {(data.intent === "list_or_by_statut" ||
               data.intent === "list_or_urgents" ||
+              data.intent === "list_or_by_periode" ||
               data.intent === "find_or_by_client" ||
               data.intent === "find_facture_by_client" ||
-              data.intent === "find_facture_by_numero") && (
+              data.intent === "find_facture_by_numero" ||
+              data.intent === "list_recent_factures") && (
               <RenduOrs items={data.resultats as ResultatOr[]} />
             )}
 
+            {/* Clients (recherche par contact) */}
+            {data.intent === "find_client_by_contact" && (
+              <RenduClients items={data.resultats as ResultatClient[]} />
+            )}
+
+            {/* Stats */}
             {data.intent === "stats_global" && (
               <RenduStats stats={data.resultats as StatsGlobal} />
+            )}
+
+            {/* Help : liste d'exemples cliquables */}
+            {data.intent === "help" && (
+              <RenduHelpExemples examples={data.resultats as string[]} />
             )}
           </>
         )}

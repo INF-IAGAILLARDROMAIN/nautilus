@@ -323,8 +323,9 @@ export const api = {
 // -----------------------------------------------------------------------------
 
 export type IntentRechercheIa =
-  // Métier (15)
+  // Métier (16)
   | "find_bateau"
+  | "find_client_by_name"
   | "find_devis_by_client"
   | "find_or_by_client"
   | "find_facture_by_client"

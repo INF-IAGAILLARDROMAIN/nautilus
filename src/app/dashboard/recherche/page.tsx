@@ -88,6 +88,7 @@ type ResultatClient = {
   email: string | null;
   telephone: string | null;
   ville: string | null;
+  _count?: { bateaux: number; devis: number };
 };
 
 function RenduBateaux({ items }: { items: ResultatBateau[] }) {
@@ -262,6 +263,12 @@ function RenduClients({ items }: { items: ResultatClient[] }) {
             {c.ville && (
               <p className="text-xs text-muted-foreground">📍 {c.ville}</p>
             )}
+            {c._count && (
+              <p className="text-xs text-muted-foreground">
+                🚤 {c._count.bateaux} bateau
+                {c._count.bateaux > 1 ? "x" : ""} · 📋 {c._count.devis} devis
+              </p>
+            )}
           </div>
           <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
         </Link>
@@ -319,6 +326,7 @@ import type { IntentRechercheIa } from "@/lib/api";
 
 const DATA_INTENTS: ReadonlyArray<IntentRechercheIa> = [
   "find_bateau",
+  "find_client_by_name",
   "find_devis_by_client",
   "find_or_by_client",
   "find_facture_by_client",
@@ -571,8 +579,9 @@ function RecherchePageInner() {
               <RenduOrs items={data.resultats as ResultatOr[]} />
             )}
 
-            {/* Clients (recherche par contact) */}
-            {data.intent === "find_client_by_contact" && (
+            {/* Clients (recherche par contact OU par nom) */}
+            {(data.intent === "find_client_by_contact" ||
+              data.intent === "find_client_by_name") && (
               <RenduClients items={data.resultats as ResultatClient[]} />
             )}
 

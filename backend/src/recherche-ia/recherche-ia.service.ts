@@ -32,8 +32,9 @@ import { RechercheLogService } from '../recherche-log/recherche-log.service';
 // ──────────────────────────────────────────────────────────────────────
 
 type IntentName =
-  // Métier (15)
+  // Métier (16)
   | 'find_bateau'
+  | 'find_client_by_name'
   | 'find_devis_by_client'
   | 'find_or_by_client'
   | 'find_facture_by_client'
@@ -490,6 +491,7 @@ export class RechercheIaService {
 
     const intentsValides: IntentName[] = [
       'find_bateau',
+      'find_client_by_name',
       'find_devis_by_client',
       'find_or_by_client',
       'find_facture_by_client',
@@ -532,6 +534,9 @@ export class RechercheIaService {
         return this.findBateau(
           entities.search_term ?? entities.client_name ?? '',
         );
+
+      case 'find_client_by_name':
+        return this.findClientByName(entities.client_name ?? '');
 
       case 'find_devis_by_client':
         return this.findDevisByClient(entities.client_name ?? '');
@@ -922,6 +927,37 @@ export class RechercheIaService {
     return { resultats, messageInfo };
   }
 
+  private async findClientByName(name: string): Promise<ExecResult> {
+    const clientWhere = buildClientWhere(name);
+    if (!clientWhere) return { resultats: [] };
+
+    const resultats = await this.prisma.client.findMany({
+      where: clientWhere,
+      select: {
+        id: true,
+        nom: true,
+        prenom: true,
+        email: true,
+        telephone: true,
+        ville: true,
+        _count: {
+          select: {
+            bateaux: true,
+            devis: true,
+          },
+        },
+      },
+      orderBy: [{ nom: 'asc' }, { prenom: 'asc' }],
+      take: 20,
+    });
+
+    const messageInfo =
+      resultats.length > 1
+        ? `J'ai trouvé ${resultats.length} clients pour « ${name} ». Précise avec un prénom pour cibler une personne.`
+        : undefined;
+    return { resultats, messageInfo };
+  }
+
   private async findClientByContact(
     telephone?: string,
     email?: string,
@@ -1055,15 +1091,32 @@ LISTE DES INTENTS (19)
 
 ══ MÉTIER (15) ══
 
-1. "find_bateau" — trouver un ou plusieurs bateaux.
-   Recherche par : nom du bateau, nom du client, marque/modèle de coque.
+1. "find_bateau" — trouver un ou plusieurs BATEAUX.
+   ⚠ La question DOIT contenir un mot évoquant un bateau :
+     "bateau", "barque", "voilier", OU une marque/modèle connue
+     (Bénéteau, Quicksilver, Zodiac, Sea Ray, Antares…).
    entities: { "search_term": "Sea Ray bleu" }
    Exemples :
    - "le bateau de Martin"   → search_term: "Martin"
    - "Sea Ray bleu"          → search_term: "Sea Ray bleu"
    - "Bénéteau Antares"      → search_term: "Bénéteau Antares"
 
-2. "find_devis_by_client" — devis d'un client.
+2. "find_client_by_name" — profil d'un CLIENT par son nom/prénom.
+   ⚠ À utiliser quand la question contient UNIQUEMENT un nom propre
+     (nom et/ou prénom), SANS mention de bateau, devis, OR, facture,
+     téléphone ou email.
+   entities: { "client_name": "Pierre Martin" }
+   Exemples :
+   - "Pierre Martin"         → client_name: "Pierre Martin"
+   - "Sophie Dupont"         → client_name: "Sophie Dupont"
+   - "Martin"                → client_name: "Martin" (nom seul)
+   - "le client Martin"      → client_name: "Martin"
+   Anti-conflits :
+   - "bateau de Martin"      → find_bateau (mot "bateau")
+   - "devis de Martin"       → find_devis_by_client
+   - "Bénéteau Antares"      → find_bateau (marque connue)
+
+3. "find_devis_by_client" — devis d'un client.
    entities: { "client_name": "Martin Pierre" }
    Mets le nom ET prénom si fournis. L'ordre n'importe pas.
    Exemples : "devis de Martin", "tous les devis de Sophie Dupont"
@@ -1234,6 +1287,15 @@ R: {"intent":"list_or_by_periode","entities":{"periode":"cette semaine"},"explan
 
 Q: "client au 06.12.34.56.78"
 R: {"intent":"find_client_by_contact","entities":{"telephone":"0612345678"},"explanation":"Tu cherches le client au numéro 06.12.34.56.78."}
+
+Q: "Pierre Martin"
+R: {"intent":"find_client_by_name","entities":{"client_name":"Pierre Martin"},"explanation":"Tu cherches le profil du client Pierre Martin."}
+
+Q: "Sophie Dupont"
+R: {"intent":"find_client_by_name","entities":{"client_name":"Sophie Dupont"},"explanation":"Tu cherches le profil du client Sophie Dupont."}
+
+Q: "le client Martin"
+R: {"intent":"find_client_by_name","entities":{"client_name":"Martin"},"explanation":"Tu cherches le profil du client Martin."}
 
 Q: "bateau avec plaque F2T123456"
 R: {"intent":"find_bateau_by_plaque_moteur","entities":{"plaque":"F2T123456"},"explanation":"Tu cherches le bateau dont la plaque moteur est F2T123456."}

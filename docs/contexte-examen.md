@@ -81,7 +81,7 @@ Le TP DWWM se compose de **2 blocs de compétences** :
 | Rôle | ECF (Évaluation en Cours de Formation) | Soutenance finale (Dossier Projet) |
 | État | ✅ Rendu le 17/02/2026 | 🟡 En cours (mai-juin 2026) |
 | Repo | `INF-IAGAILLARDROMAIN/vite-et-gourmand` | `INF-IAGAILLARDROMAIN/nautilus` |
-| Stack | Multi-app monorepo | Next.js 16 + NestJS 11 + Prisma 7 |
+| Stack | Multi-app monorepo | Next.js 16 + NestJS 11 + Prisma 6 |
 
 ## Évolution post-examen
 

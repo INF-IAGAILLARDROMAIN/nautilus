@@ -1,180 +1,236 @@
-# MCD — Modèle Conceptuel de Données — Nautilus
+# MCD / MLD / MPD — Modèle de Données — Nautilus
 
-> **Modèle Conceptuel de Données** de l'application Nautilus.
-> 5 entités relationnelles + relations + cardinalités.
+> Documentation complète de la base de données Nautilus selon les 3 niveaux d'abstraction exigés par le référentiel TP DWWM :
+> - **MCD** : Modèle Conceptuel de Données (entités + relations + cardinalités)
+> - **MLD** : Modèle Logique de Données (transformation en tables avec FK)
+> - **MPD** : Modèle Physique de Données (types SQL précis, contraintes, index)
 
 ---
 
-## 1️⃣ MCD principal (Mermaid)
-
-Diagramme entité-relation à coller dans **Mermaid Live Editor** (https://mermaid.live) pour exporter en PNG/SVG haute résolution :
+## 1️⃣ MCD complet (Mermaid — à exporter en PNG via mermaid.live)
 
 ```mermaid
 erDiagram
-    CLIENT ||--o{ BATEAU : "possède"
-    CLIENT ||--o{ DEVIS : "commande"
-    BATEAU ||--o{ DEVIS : "concerné par"
-    DEVIS ||--|| ORDRE_REPARATION : "génère 1:1"
-    DEVIS ||--o{ LIGNE_DEVIS : "contient"
+    CLIENT ||--o{ BATEAU : "possède (1:N)"
+    CLIENT ||--o{ DEVIS : "commande (1:N)"
+    BATEAU ||--o{ DEVIS : "concerné par (1:N optionnel)"
+    DEVIS ||--|| ORDRE_REPARATION : "génère (1:1)"
+    DEVIS ||--o{ LIGNE_DEVIS : "contient (1:N)"
 
     CLIENT {
-        string id PK
-        string nom
-        string prenom
-        string email "unique, nullable"
-        string telephone
-        string adresse
-        string codePostal
-        string ville
-        enum type "PARTICULIER ou PROFESSIONNEL"
-        datetime createdAt
-        datetime updatedAt
+        string id PK "cuid"
+        string nom "NOT NULL"
+        string prenom "NOT NULL"
+        string email UK "unique nullable"
+        string telephone "nullable"
+        string adresse "nullable"
+        string codePostal "VarChar(10) nullable"
+        string ville "VarChar(100) nullable"
+        text notes "nullable"
+        enum type "TypeClient PARTICULIER ou PROFESSIONNEL"
+        datetime createdAt "DEFAULT now()"
+        datetime updatedAt "auto update"
     }
 
     BATEAU {
-        string id PK
-        string nom "surnom optionnel"
-        string marque
-        string modele
-        enum typeCoque "8 valeurs"
-        string immatriculation "optionnel"
-        int annee "optionnel"
-        string marqueMoteur
-        string modeleMoteur
-        string plaqueMoteur "unique, nullable"
-        int puissanceCV
-        string helice
-        string clientId FK "Client"
-        datetime createdAt
-        datetime updatedAt
+        string id PK "cuid"
+        string nom "VarChar(60) surnom nullable"
+        string marque "NOT NULL"
+        string modele "NOT NULL"
+        enum typeCoque "TypeCoque 8 valeurs DEFAULT STRATIFIE"
+        string immatriculation "VarChar(20) nullable"
+        int annee "nullable"
+        text notes "nullable"
+        string marqueMoteur "nullable"
+        string modeleMoteur "nullable"
+        string plaqueMoteur UK "unique nullable"
+        int puissanceCV "nullable"
+        string helice "VarChar(100) nullable"
+        string clientId FK "Client ON DELETE CASCADE"
+        datetime createdAt "DEFAULT now()"
+        datetime updatedAt "auto update"
     }
 
     DEVIS {
-        string id PK
-        string numeroDevis "DEV-AAAA-XXXX unique"
-        string description
-        decimal totalHT
-        decimal tauxTVA "défaut 20"
-        decimal totalTTC
-        enum statut "BROUILLON, ENVOYE, VALIDE, REFUSE"
-        date dateValidite
-        string modalitesPaiement
-        string clientId FK "Client"
-        string bateauId FK "Bateau, nullable"
-        datetime createdAt
-        datetime updatedAt
+        string id PK "cuid"
+        string numeroDevis UK "unique DEV-AAAA-XXXX"
+        string description "nullable"
+        decimal totalHT "DECIMAL(10,2) DEFAULT 0"
+        decimal tauxTVA "DECIMAL(5,2) DEFAULT 20.00"
+        decimal totalTTC "DECIMAL(10,2) DEFAULT 0"
+        enum statut "StatutDevis DEFAULT BROUILLON"
+        datetime dateValidite "nullable"
+        text modalitesPaiement "nullable"
+        string clientId FK "Client ON DELETE RESTRICT"
+        string bateauId FK "Bateau ON DELETE SetNull, nullable"
+        datetime createdAt "DEFAULT now()"
+        datetime updatedAt "auto update"
     }
 
     LIGNE_DEVIS {
-        string id PK
-        string description
-        decimal quantite
-        decimal prixUnitaireHT
-        decimal totalLigneHT
-        int ordre "position dans le devis"
-        string devisId FK "Devis"
+        string id PK "cuid"
+        string description "NOT NULL"
+        decimal quantite "DECIMAL(10,2) DEFAULT 1"
+        decimal prixUnitaireHT "DECIMAL(10,2)"
+        decimal totalLigneHT "DECIMAL(10,2)"
+        int ordre "DEFAULT 0 position"
+        string devisId FK "Devis ON DELETE CASCADE"
     }
 
     ORDRE_REPARATION {
-        string id PK
-        string description
-        enum type "REPARATION, ENTRETIEN, HIVERNAGE, DESHIVERNAGE, DEPANNAGE"
-        enum urgence "NORMAL ou URGENT"
-        string mecano "champ libre"
-        enum statut "CREE, EN_COURS, TERMINE, FACTURE"
-        string numeroFacture "FAC-AAAA-XXXX unique nullable"
-        string devisId FK "Devis, unique = relation 1:1"
-        date dateDebut
-        date dateFin
-        datetime createdAt
-        datetime updatedAt
+        string id PK "cuid"
+        string description "nullable"
+        enum type "TypeOR DEFAULT REPARATION"
+        enum urgence "UrgenceOR DEFAULT NORMAL"
+        string mecano "nullable champ libre"
+        enum statut "StatutOR DEFAULT CREE"
+        string numeroFacture UK "unique nullable FAC-AAAA-XXXX"
+        string devisId FK "UNIQUE = relation 1:1, ON DELETE RESTRICT"
+        datetime dateDebut "nullable"
+        datetime dateFin "nullable"
+        datetime createdAt "DEFAULT now()"
+        datetime updatedAt "auto update"
     }
 ```
 
----
-
-## 2️⃣ Explication des relations
-
-| Relation | Cardinalité | Signification métier |
-|---|---|---|
-| **Client → Bateau** | 1 à N | Un client possède un ou plusieurs bateaux. Un bateau appartient à UN seul client. |
-| **Client → Devis** | 1 à N | Un client peut avoir plusieurs devis. Chaque devis est associé à UN client. |
-| **Bateau → Devis** | 1 à N (optionnel) | Un bateau peut avoir plusieurs devis. Un devis peut être lié à un bateau OU être un devis pré-vente sans bateau (`bateauId` nullable). |
-| **Devis → LigneDevis** | 1 à N | Un devis contient une ou plusieurs lignes (vidange, pièces, main d'œuvre…). |
-| **Devis → OrdreReparation** | 1 à 1 | Un devis validé génère exactement un OR (`devisId` unique sur OR). |
-| **OrdreReparation → Facture** | — | La Facture n'est PAS une entité ; c'est un PDF généré à la volée à partir de l'OR (au statut FACTURE) + son Devis lié. Un numéro de facture séquentiel (`FAC-AAAA-XXXX`) est généré au passage au statut FACTURE. |
+> 📌 **Note importante** : la **Facture** n'est PAS une entité séparée du modèle. C'est un PDF généré à la volée à partir de l'OR (quand son statut passe à FACTURE) + le Devis lié. Cette décision économise une table sans perte fonctionnelle.
 
 ---
 
-## 3️⃣ Workflow métier (état des entités)
+## 2️⃣ Tableau des relations (cardinalités détaillées)
+
+| Relation | Côté gauche | Côté droit | Sens métier |
+|---|---|---|---|
+| **Client → Bateau** | 1 (obligatoire) | 0..N | Un client peut posséder 0, 1 ou N bateaux ; un bateau a UN seul propriétaire |
+| **Client → Devis** | 1 (obligatoire) | 0..N | Tous les devis ont un client référent (même pré-vente) |
+| **Bateau → Devis** | 0..1 (optionnel) | 0..N | Un devis peut être SANS bateau (pré-vente / pièces génériques) — d'où `bateauId nullable` |
+| **Devis → OR** | 1 (obligatoire) | 0..1 (relation 1:1 stricte) | Un OR est créé automatiquement quand le devis est VALIDÉ avec un bateau lié |
+| **Devis → LigneDevis** | 1 (obligatoire) | 1..N | Un devis contient au moins une ligne (CASCADE à la suppression) |
+
+---
+
+## 3️⃣ Workflow métier (diagramme d'état)
 
 ```mermaid
 stateDiagram-v2
-    [*] --> BROUILLON : Création d'un Devis
+    [*] --> DevisBrouillon : Création du devis
 
-    state Devis {
-        BROUILLON --> ENVOYE : Envoi au client
-        ENVOYE --> VALIDE : Acceptation client
-        ENVOYE --> REFUSE : Refus client
-        VALIDE --> CreationOR : Auto-création de l'OR
+    state "Devis" as Devis {
+        DevisBrouillon: BROUILLON
+        DevisEnvoye: ENVOYE
+        DevisValide: VALIDE
+        DevisRefuse: REFUSE
+        DevisBrouillon --> DevisEnvoye : Envoi au client
+        DevisEnvoye --> DevisValide : Acceptation client
+        DevisEnvoye --> DevisRefuse : Refus client
+        DevisValide --> [*] : Génération auto de l'OR
     }
 
-    state OR {
-        CreationOR --> CREE
-        CREE --> EN_COURS : Démarrage atelier
-        EN_COURS --> TERMINE : Fin des travaux
-        TERMINE --> FACTURE : Facturation
-        FACTURE --> [*] : PDF Facture généré
+    state "Ordre de Réparation" as OR {
+        OrCree: CREE
+        OrEnCours: EN_COURS
+        OrTermine: TERMINE
+        OrFacture: FACTURE
+        OrCree --> OrEnCours : Démarrage atelier
+        OrEnCours --> OrTermine : Fin des travaux
+        OrTermine --> OrFacture : Facturation
+        OrFacture --> [*] : PDF Facture généré
     }
+
+    DevisValide --> OrCree : Auto-création
 ```
 
 ---
 
-## 4️⃣ Contraintes d'intégrité PostgreSQL
+## 4️⃣ MLD — Tableau des tables physiques PostgreSQL
+
+| Table SQL | Modèle Prisma | Particularité |
+|---|---|---|
+| `Client` | `Client` | — |
+| `Bateau` | `Bateau` | — |
+| `Devis` | `Devis` | — |
+| `LigneDevis` | `LigneDevis` | — |
+| `ordre_reparation` | `OrdreReparation` | Renommé via `@@map` car `OR` est un mot-clé réservé Prisma (opérateur logique) |
+
+---
+
+## 5️⃣ MPD — Contraintes d'intégrité PostgreSQL
 
 | Contrainte | Détail |
 |---|---|
-| **FK CASCADE** | `Bateau.clientId` → suppression du client efface ses bateaux |
-| **FK RESTRICT** | `Devis.clientId` → impossible de supprimer un client ayant des devis |
-| **FK RESTRICT** | `OrdreReparation.devisId` → impossible de supprimer un devis lié à un OR |
-| **FK CASCADE** | `LigneDevis.devisId` → suppression du devis efface ses lignes |
-| **UNIQUE** | `Client.email` (nullable) — un email = un client max |
-| **UNIQUE** | `Bateau.plaqueMoteur` (nullable) — une plaque = un bateau max |
-| **UNIQUE** | `Devis.numeroDevis` — pas de doublon de numéro de devis |
-| **UNIQUE** | `OrdreReparation.devisId` — relation 1:1 stricte Devis ↔ OR |
-| **UNIQUE** | `OrdreReparation.numeroFacture` (nullable) — pas de doublon de facture |
+| **FK `Bateau.clientId`** | `ON DELETE CASCADE` — supprimer un client supprime ses bateaux |
+| **FK `Devis.clientId`** | `ON DELETE RESTRICT` — impossible de supprimer un client ayant des devis |
+| **FK `Devis.bateauId`** | `ON DELETE SetNull` — supprimer un bateau laisse les devis orphelins (ne casse pas l'historique) |
+| **FK `LigneDevis.devisId`** | `ON DELETE CASCADE` — supprimer un devis supprime ses lignes |
+| **FK `OrdreReparation.devisId`** | `ON DELETE RESTRICT` — impossible de supprimer un devis lié à un OR |
+| **UNIQUE `Client.email`** | Nullable mais unique — un email = un client max |
+| **UNIQUE `Bateau.plaqueMoteur`** | Nullable mais unique — plusieurs NULL acceptés par PostgreSQL |
+| **UNIQUE `Devis.numeroDevis`** | Pas de doublon de numéro de devis |
+| **UNIQUE `OrdreReparation.devisId`** | Relation 1:1 stricte Devis ↔ OR |
+| **UNIQUE `OrdreReparation.numeroFacture`** | Nullable, généré au passage au statut FACTURE |
 
 ---
 
-## 5️⃣ Index PostgreSQL pour la performance
+## 6️⃣ MPD — Index pour la performance des requêtes
 
-| Index | Justification |
+| Index | Table | Justification métier |
+|---|---|---|
+| `idx_client_nom_prenom` | `Client(nom, prenom)` | Recherche par nom (barre IA + recherche manuelle) |
+| `idx_bateau_clientId` | `Bateau(clientId)` | Accès aux bateaux d'un client (fiche client) |
+| `idx_bateau_marque_modele` | `Bateau(marque, modele)` | Recherche par marque/modèle de coque |
+| `idx_bateau_marqueMoteur` | `Bateau(marqueMoteur)` | Intent IA `list_bateaux_by_moteur` |
+| `idx_devis_clientId` | `Devis(clientId)` | Liste devis d'un client |
+| `idx_devis_bateauId` | `Devis(bateauId)` | Liste devis d'un bateau |
+| `idx_devis_statut` | `Devis(statut)` | Filtrage par statut (BROUILLON, VALIDE…) |
+| `idx_lignedevis_devisId` | `LigneDevis(devisId)` | Récupération des lignes d'un devis |
+| `idx_or_statut` | `ordre_reparation(statut)` | Filtrage par statut (intent `list_or_by_statut`) |
+| `idx_or_mecano` | `ordre_reparation(mecano)` | Filtrage par mécano (V2 multi-utilisateurs) |
+
+---
+
+## 7️⃣ Énumérations utilisées (types PostgreSQL)
+
+```sql
+TypeClient    : PARTICULIER, PROFESSIONNEL                              (2 valeurs)
+StatutDevis   : BROUILLON, ENVOYE, VALIDE, REFUSE                       (4 valeurs)
+TypeOR        : ENTRETIEN, REPARATION, HIVERNAGE, DESHIVERNAGE, DEPANNAGE (5 valeurs)
+UrgenceOR     : NORMAL, URGENT                                          (2 valeurs)
+StatutOR      : CREE, EN_COURS, TERMINE, FACTURE                        (4 valeurs)
+TypeCoque     : STRATIFIE, ALUMINIUM, POLYETHYLENE, SEMI_RIGIDE,
+                PNEUMATIQUE, BOIS, ACIER, AUTRE                         (8 valeurs)
+```
+
+---
+
+## 8️⃣ Statistiques du modèle
+
+| Élément | Compte |
 |---|---|
-| `Client(nom, prenom)` | Recherche client par nom dans le moteur IA et la barre de recherche |
-| `Bateau(clientId)` | Accès rapide à tous les bateaux d'un client (fiche client) |
-| `Bateau(marqueMoteur)` | Recherche par marque moteur (intent `list_bateaux_by_moteur`) |
-| `OrdreReparation(statut)` | Filtrage par statut (intent `list_or_by_statut`) |
-| `OrdreReparation(mecano)` | Filtrage par mécano (V2) |
+| Tables physiques | **5** |
+| Énumérations | **6** |
+| Clés primaires (PK) | **5** (toutes en `cuid()`) |
+| Clés étrangères (FK) | **5** |
+| Contraintes UNIQUE | **5** |
+| Index | **10** |
+| Attributs au total | **~65** |
 
 ---
 
-## 6️⃣ Comment exporter en image
+## 9️⃣ Documents liés
 
-### Option A — Mermaid Live Editor (recommandé)
+- 📄 **Schéma Prisma complet** : [`schema-prisma-complet.md`](schema-prisma-complet.md) — source de vérité versionnée Git
+- 📄 **Script SQL de création** : [`migration-sql.md`](migration-sql.md) — SQL natif PostgreSQL généré par Prisma
+- 🖼 **Image PNG** : [`mcd-nautilus.png`](mcd-nautilus.png) — export Mermaid haute résolution
+- 🖼 **Image SVG** : [`mcd-nautilus.svg`](mcd-nautilus.svg) — vectoriel pour zoom infini
+
+---
+
+## 🔟 Comment regénérer le MCD en image
 
 1. Va sur **https://mermaid.live**
-2. Colle le bloc Mermaid de la section 1 dans l'éditeur de gauche
-3. Le rendu apparaît à droite
-4. Bouton **"Actions" → "PNG"** ou **"SVG"** pour télécharger
-
-### Option B — VSCode avec extension
-
-1. Installe l'extension **"Markdown Preview Mermaid Support"**
-2. Ouvre ce fichier .md dans VSCode
-3. Cmd + Shift + V → tu vois le rendu directement
-4. Capture la zone du diagramme
-
-### Option C — Outil en ligne
-
-- https://www.draw.io (importer depuis Mermaid)
-- https://app.diagrams.net
+2. Efface le contenu de l'éditeur de gauche
+3. Colle le bloc Mermaid de la **section 1** ci-dessus
+4. Le rendu apparaît à droite
+5. En bas à gauche, déplie **"Actions"**
+6. Saisis `Width: 2400` (haute résolution)
+7. Clique sur **"PNG"** ou **"SVG"** → téléchargement

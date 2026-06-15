@@ -1,10 +1,21 @@
 # Nautilus
 
-> **Application web de gestion d'atelier nautique**, dotée d'un moteur de recherche en langage naturel propulsé par un agent IA.
+> **Application web de gestion d'atelier nautique**, dotée d'un moteur de recherche en langage naturel propulsé par **Mistral AI**.
 >
 > Projet de fin de formation — **TP Développeur Web et Web Mobile (RNCP 37674)**, Studi, session juin-juillet 2026. Auteur : Romain Gaillard.
 
+[![Front](https://img.shields.io/badge/Front-Vercel-black)](https://nautilus-silk.vercel.app)
+[![Back](https://img.shields.io/badge/Back-Railway-purple)](https://nautilus-production-970f.up.railway.app/api)
+[![IA](https://img.shields.io/badge/IA-Mistral_AI-orange)](https://mistral.ai)
+[![Tests](https://img.shields.io/badge/Tests-9%2F9_passing-green)]()
+
 ---
+
+## 🌐 Application en production
+
+- **Front (Next.js)** : https://nautilus-silk.vercel.app
+- **Back API (NestJS)** : https://nautilus-production-970f.up.railway.app/api
+- **Infrastructure 100 % UE** : Vercel (CDN edge) · Railway (europe-west4) · Neon (Frankfurt) · MongoDB Atlas (Paris) · Supabase (Paris) · Mistral AI (France)
 
 ## 🎯 Le produit en une phrase
 
@@ -22,7 +33,12 @@ Client  →  Bateau  →  Devis  →  OR (Ordre de Réparation)
 ### 3 briques fonctionnelles
 1. **CRUD complet** sur les 4 entités (créer, lire, modifier, supprimer)
 2. **🌟 Moteur de recherche IA** en langage naturel — la fonctionnalité signature
-3. **Génération PDF** côté serveur (devis / facture, imprimables et téléchargeables)
+   - **20 intents** pré-codés (métier + UX + sécurité)
+   - Pattern « Intent + Entities » : le LLM ne génère JAMAIS de SQL → 0 injection possible
+   - **Refus catégorisés** : credentials, RGPD, confidentiel, manipulation
+   - Toutes les recherches loguées en MongoDB (audit + stats)
+   - Temps de réponse moyen ~600 ms
+3. **Génération PDF** côté serveur (devis / OR / facture, imprimables et téléchargeables)
 
 ### Flux métier
 1. Le chef crée un **Devis** sur un bateau (statut `brouillon → envoyé`)
@@ -41,13 +57,18 @@ Client  →  Bateau  →  Devis  →  OR (Ordre de Réparation)
 
 ### Back-end (`/backend`)
 - **NestJS 11** + **TypeScript**
-- **Prisma 6** + **PostgreSQL** (hébergé sur **Neon**)
-- **MongoDB Atlas** pour l'historique des recherches IA *(justifie l'usage NoSQL au côté du relationnel)*
-- **Helmet**, **CORS strict**, **Throttler** (rate limiting), validation DTO globale
+- **Prisma 6** + **PostgreSQL** (hébergé sur **Neon**, région Frankfurt)
+- **Mongoose** + **MongoDB Atlas** (Paris) pour l'historique des recherches IA *(justifie l'usage NoSQL au côté du relationnel)*
+- **Mistral AI** (`mistral-small-latest`, hébergé en France) pour la classification d'intent
+- **Helmet**, **CORS strict multi-origines**, **Throttler** (rate limiting), validation DTO globale
+- **Guard JWT Supabase ES256** via JWKS (lib `jose`)
+- **PDFKit** pour la génération PDF côté serveur
 - Architecture stricte **Module → Controller → Service → DTO**
+- **9 tests Jest verts** sur les services critiques (clients, devis, PDF, log)
 
-### Hébergement (cible)
-- Front : **Vercel** · Back : **Railway** · BDD : **Neon** + **MongoDB Atlas**
+### Hébergement (en production)
+- Front : **Vercel** · Back : **Railway** (europe-west4) · BDD : **Neon** + **MongoDB Atlas** · Auth : **Supabase** · IA : **Mistral AI**
+- **100 % UE** pour conformité RGPD
 
 ## 🚀 Démarrage local
 

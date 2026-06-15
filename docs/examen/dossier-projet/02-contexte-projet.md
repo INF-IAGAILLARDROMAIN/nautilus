@@ -125,13 +125,13 @@ Ce périmètre a été figé le **1ᵉʳ juin 2026** et n'a pas bougé depuis, �
 
 | Couche | Technologies |
 |---|---|
-| Front-end | Next.js 16, React 19, TypeScript, Tailwind CSS v4, React Hook Form + Zod, TanStack Query, Framer Motion |
-| Back-end | NestJS 11, TypeScript, Prisma 7 (ORM) |
+| Front-end | Next.js 16, React 19, TypeScript, Tailwind CSS v4, React Hook Form + Zod, TanStack Query |
+| Back-end | NestJS 11, TypeScript, Prisma 6 (ORM) |
 | BDD relationnelle | PostgreSQL hébergé sur Neon (région Frankfurt) |
 | BDD NoSQL | MongoDB hébergé sur MongoDB Atlas (région Paris — historique des recherches IA) |
 | Authentification | Supabase Auth (JWT ES256 asymétrique via JWKS) |
 | Moteur IA | Mistral AI (`mistral-small-latest`) — souveraineté française, hébergement européen |
-| Génération PDF | pdf-lib + templates côté serveur NestJS |
+| Génération PDF | pdfkit + templates côté serveur NestJS |
 | Déploiement front | Vercel |
 | Déploiement back | Railway (région europe-west4) |
 | Versioning | Git + GitHub (repo public : `INF-IAGAILLARDROMAIN/nautilus`) |

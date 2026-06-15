@@ -203,7 +203,7 @@ Le même pattern est utilisé pour générer `FAC-AAAA-XXXX` quand un OR passe a
 
 ### 4.2.3 Service PDF — génération côté serveur
 
-La génération des PDF (devis, OR, facture) se fait **entièrement côté serveur** via la librairie `pdf-lib`. Aucun rendu côté client → garantie de fidélité graphique et possibilité de signer/sécuriser le document.
+La génération des PDF (devis, OR, facture) se fait **entièrement côté serveur** via la librairie `pdfkit`. Aucun rendu côté client → garantie de fidélité graphique et possibilité de signer/sécuriser le document.
 
 Le service expose 3 méthodes : `generateDevisPdf(devisId)`, `generateOrPdf(orId)`, `generateFacturePdf(orId)`. Chaque méthode produit un `Buffer` binaire renvoyé directement au client en `Content-Type: application/pdf`.
 

@@ -222,7 +222,7 @@ export default function NouveauClientPage() {
                 input={
                   <Input
                     {...register("codePostal")}
-                    placeholder="Ex. 56690"
+                    placeholder="Ex. 56000"
                     autoComplete="postal-code"
                     inputMode="numeric"
                     disabled={isSubmitting}
@@ -236,7 +236,7 @@ export default function NouveauClientPage() {
                   input={
                     <Input
                       {...register("ville")}
-                      placeholder="Ex. Landévant"
+                      placeholder="Ex. Vannes"
                       autoComplete="address-level2"
                       disabled={isSubmitting}
                     />

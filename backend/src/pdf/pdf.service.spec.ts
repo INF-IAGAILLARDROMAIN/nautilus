@@ -17,8 +17,8 @@ describe('PdfService', () => {
     email: 'sophie@example.com',
     telephone: '06 XX XX XX XX',
     adresse: '12 quai du port',
-    codePostal: '56690',
-    ville: 'Landévant',
+    codePostal: '00000',
+    ville: 'Ville-Type',
   };
 
   const fakeLignes = [

@@ -180,7 +180,7 @@ export class PdfService {
       .fillColor('#666')
       .font('Helvetica')
       .text('Atelier nautique — Spécialiste hors-bord', 40, 65)
-      .text('Port de plaisance · 56690 Landévant', 40, 78)
+      .text('Port de plaisance · ZZ000 Ville-Type', 40, 78)
       .text('contact@nautilus.atelier · 06 XX XX XX XX', 40, 91);
 
     // Numéro de document à droite
@@ -515,7 +515,7 @@ export class PdfService {
       .fillColor('#888')
       .font('Helvetica')
       .text(
-        'Nautilus · Atelier nautique · Port de plaisance · 56690 Landévant',
+        'Nautilus · Atelier nautique · Port de plaisance · ZZ000 Ville-Type',
         40,
         footerY,
         { width: 515, align: 'center' },

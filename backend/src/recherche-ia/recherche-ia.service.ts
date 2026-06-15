@@ -32,7 +32,7 @@ import { RechercheLogService } from '../recherche-log/recherche-log.service';
 // ──────────────────────────────────────────────────────────────────────
 
 type IntentName =
-  // Métier (16)
+  // Métier (19)
   | 'find_bateau'
   | 'find_client_by_name'
   | 'find_devis_by_client'
@@ -41,6 +41,9 @@ type IntentName =
   | 'list_or_by_statut'
   | 'list_or_urgents'
   | 'find_facture_by_numero'
+  | 'list_recent_clients'
+  | 'list_recent_bateaux'
+  | 'list_recent_or'
   | 'list_recent_devis'
   | 'list_recent_factures'
   | 'list_bateaux_by_moteur'
@@ -498,6 +501,9 @@ export class RechercheIaService {
       'list_or_by_statut',
       'list_or_urgents',
       'find_facture_by_numero',
+      'list_recent_clients',
+      'list_recent_bateaux',
+      'list_recent_or',
       'list_recent_devis',
       'list_recent_factures',
       'list_bateaux_by_moteur',
@@ -558,6 +564,21 @@ export class RechercheIaService {
 
       case 'find_facture_by_numero':
         return this.findFactureByNumero(entities.numero ?? '');
+
+      case 'list_recent_clients':
+        return this.listRecentClients(
+          parseQuantite(entities.quantite, DEFAULT_QUANTITE_PLURIEL),
+        );
+
+      case 'list_recent_bateaux':
+        return this.listRecentBateaux(
+          parseQuantite(entities.quantite, DEFAULT_QUANTITE_PLURIEL),
+        );
+
+      case 'list_recent_or':
+        return this.listRecentOr(
+          parseQuantite(entities.quantite, DEFAULT_QUANTITE_PLURIEL),
+        );
 
       case 'list_recent_devis':
         return this.listRecentDevis(
@@ -812,6 +833,50 @@ export class RechercheIaService {
         },
       },
       take: 20,
+    });
+    return { resultats };
+  }
+
+  private async listRecentClients(quantite: number): Promise<ExecResult> {
+    const resultats = await this.prisma.client.findMany({
+      select: {
+        id: true,
+        nom: true,
+        prenom: true,
+        email: true,
+        telephone: true,
+        ville: true,
+        _count: { select: { bateaux: true, devis: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: quantite,
+    });
+    return { resultats };
+  }
+
+  private async listRecentBateaux(quantite: number): Promise<ExecResult> {
+    const resultats = await this.prisma.bateau.findMany({
+      include: {
+        client: { select: { id: true, nom: true, prenom: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: quantite,
+    });
+    return { resultats };
+  }
+
+  private async listRecentOr(quantite: number): Promise<ExecResult> {
+    const resultats = await this.prisma.ordreReparation.findMany({
+      include: {
+        devis: {
+          include: {
+            client: { select: { id: true, nom: true, prenom: true } },
+            bateau: { select: { id: true, marque: true, modele: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: quantite,
     });
     return { resultats };
   }
@@ -1155,6 +1220,27 @@ LISTE DES INTENTS (19)
    Même règle singulier/pluriel que list_recent_devis.
    ⚠ Si un nom de client est mentionné → find_facture_by_client.
 
+9bis. "list_recent_clients" — derniers clients enregistrés.
+   entities: { "quantite": "1" | "5" | "10" }
+   Exemples : "le dernier client", "les clients récents",
+              "qui sont les clients récents", "les 5 derniers clients"
+
+9ter. "list_recent_bateaux" — derniers bateaux enregistrés.
+   entities: { "quantite": "1" | "5" | "10" }
+   Exemples : "le dernier bateau enregistré", "les bateaux récents",
+              "donne moi le nom du dernier bateau", "les 5 derniers bateaux"
+   ⚠ Si une marque/modèle moteur est mentionné → list_bateaux_by_moteur.
+   ⚠ Si un nom de client est mentionné → find_bateau.
+
+9quater. "list_recent_or" — derniers OR créés (TOUS statuts confondus).
+   entities: { "quantite": "1" | "5" | "10" }
+   Exemples : "montre moi les OR", "le dernier OR", "les OR récents",
+              "les 10 derniers OR"
+   ⚠ Si un statut explicite est mentionné → list_or_by_statut.
+   ⚠ Si un nom de client mentionné → find_or_by_client.
+   ⚠ Si "urgent" ou "qui presse" → list_or_urgents.
+   ⚠ Si une période mentionnée → list_or_by_periode.
+
 10. "list_bateaux_by_moteur" — bateaux filtrés par moteur.
     entities: { "marque"?, "modele"?, "puissance_cv"?, "annee_min"? }
     Marques moteurs connues : Yamaha, Suzuki, Mercury, Honda, Tohatsu,
@@ -1296,6 +1382,24 @@ R: {"intent":"find_client_by_name","entities":{"client_name":"Sophie Dupont"},"e
 
 Q: "le client Martin"
 R: {"intent":"find_client_by_name","entities":{"client_name":"Martin"},"explanation":"Tu cherches le profil du client Martin."}
+
+Q: "montre moi les OR"
+R: {"intent":"list_recent_or","entities":{"quantite":"10"},"explanation":"Tu veux voir les derniers OR (tous statuts confondus)."}
+
+Q: "le dernier OR"
+R: {"intent":"list_recent_or","entities":{"quantite":"1"},"explanation":"Tu veux voir l'OR le plus récent."}
+
+Q: "donne moi le nom du dernier bateau enregistré"
+R: {"intent":"list_recent_bateaux","entities":{"quantite":"1"},"explanation":"Tu cherches le bateau enregistré le plus récemment."}
+
+Q: "les 5 derniers bateaux"
+R: {"intent":"list_recent_bateaux","entities":{"quantite":"5"},"explanation":"Tu veux voir les 5 bateaux les plus récents."}
+
+Q: "le dernier client enregistré"
+R: {"intent":"list_recent_clients","entities":{"quantite":"1"},"explanation":"Tu cherches le client enregistré le plus récemment."}
+
+Q: "les clients récents"
+R: {"intent":"list_recent_clients","entities":{"quantite":"10"},"explanation":"Tu veux voir les derniers clients enregistrés."}
 
 Q: "bateau avec plaque F2T123456"
 R: {"intent":"find_bateau_by_plaque_moteur","entities":{"plaque":"F2T123456"},"explanation":"Tu cherches le bateau dont la plaque moteur est F2T123456."}

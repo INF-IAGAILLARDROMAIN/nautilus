@@ -323,7 +323,7 @@ export const api = {
 // -----------------------------------------------------------------------------
 
 export type IntentRechercheIa =
-  // Métier (16)
+  // Métier (19)
   | "find_bateau"
   | "find_client_by_name"
   | "find_devis_by_client"
@@ -332,6 +332,9 @@ export type IntentRechercheIa =
   | "list_or_by_statut"
   | "list_or_urgents"
   | "find_facture_by_numero"
+  | "list_recent_clients"
+  | "list_recent_bateaux"
+  | "list_recent_or"
   | "list_recent_devis"
   | "list_recent_factures"
   | "list_bateaux_by_moteur"

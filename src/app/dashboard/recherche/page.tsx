@@ -333,6 +333,9 @@ const DATA_INTENTS: ReadonlyArray<IntentRechercheIa> = [
   "list_or_by_statut",
   "list_or_urgents",
   "find_facture_by_numero",
+  "list_recent_clients",
+  "list_recent_bateaux",
+  "list_recent_or",
   "list_recent_devis",
   "list_recent_factures",
   "list_bateaux_by_moteur",
@@ -558,7 +561,8 @@ function RecherchePageInner() {
             {/* Bateaux */}
             {(data.intent === "find_bateau" ||
               data.intent === "find_bateau_by_plaque_moteur" ||
-              data.intent === "list_bateaux_by_moteur") && (
+              data.intent === "list_bateaux_by_moteur" ||
+              data.intent === "list_recent_bateaux") && (
               <RenduBateaux items={data.resultats as ResultatBateau[]} />
             )}
 
@@ -572,6 +576,7 @@ function RecherchePageInner() {
             {(data.intent === "list_or_by_statut" ||
               data.intent === "list_or_urgents" ||
               data.intent === "list_or_by_periode" ||
+              data.intent === "list_recent_or" ||
               data.intent === "find_or_by_client" ||
               data.intent === "find_facture_by_client" ||
               data.intent === "find_facture_by_numero" ||
@@ -579,9 +584,10 @@ function RecherchePageInner() {
               <RenduOrs items={data.resultats as ResultatOr[]} />
             )}
 
-            {/* Clients (recherche par contact OU par nom) */}
+            {/* Clients (recherche par contact / nom / liste récente) */}
             {(data.intent === "find_client_by_contact" ||
-              data.intent === "find_client_by_name") && (
+              data.intent === "find_client_by_name" ||
+              data.intent === "list_recent_clients") && (
               <RenduClients items={data.resultats as ResultatClient[]} />
             )}
 

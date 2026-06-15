@@ -61,6 +61,57 @@ Front Next.js : 0 vulnerabilities
 
 Aucune vulnérabilité connue dans les dépendances directes ou transitives.
 
+### 7.2.3 Mise à jour proactive des dépendances (campagne du 15/06/2026)
+
+Bien que `npm audit` ne reporte **aucune CVE**, j'ai effectué une **campagne de mise à jour proactive** pour réduire la fenêtre d'exposition à d'éventuelles CVE futures qui pourraient affecter des versions plus anciennes.
+
+**Démarche en 4 étapes :**
+
+1. **Audit `npm outdated`** sur les 2 projets (front Next.js + back NestJS) → 25 paquets identifiés en retard de version.
+2. **Tri par criticité de la mise à jour** :
+   - 🟢 14 paquets en retard de **patch** (correctifs sans breaking change)
+   - 🟡 5 paquets en retard de **mineure** (nouvelles fonctionnalités compatibles)
+   - 🔴 6 paquets en retard de **majeure** (breaking changes potentiels)
+3. **Application** : patches + mineures uniquement. Les majeures sont conscientement reportées (risque de régression trop élevé à 14 jours de l'examen).
+4. **Vérification post-MAJ** : `npm audit`, builds, tests Jest, smoke test en production.
+
+**Liste des mises à jour appliquées (commit `b405a31` du 15/06/2026) :**
+
+| Paquet | Avant | Après | Type | Motif |
+|---|---|---|---|---|
+| `next` | 16.2.6 | 16.2.9 | Patch | Correctifs upstream |
+| `react`, `react-dom` | 19.2.4 | 19.2.7 | Patch | Correctifs upstream |
+| `eslint-config-next` | 16.2.6 | 16.2.9 | Patch | Alignement avec Next |
+| `@supabase/ssr` | ^0.10.3 | ^0.12.0 | Mineure | **Couche auth — sensible** |
+| `@nestjs/*` (5 paquets) | 11.1.24 | 11.1.27 | Patch | Correctifs framework |
+| `@nestjs/cli` | 11.0.21 | 11.0.23 | Patch | Outils de build |
+| `pdfkit` | 0.19.0 | 0.19.1 | Patch | Correctif PDF |
+| `prettier` | 3.8.3 | 3.8.4 | Patch | Formattage |
+| `typescript-eslint` | 8.60.1 | 8.61.0 | Patch | Linter TypeScript |
+| Transitives | divers | divers | Patch / Mineure | `npm update` global |
+
+**Vérifications post-MAJ :**
+
+| Vérification | Avant MAJ | Après MAJ |
+|---|---|---|
+| `npm audit` front | 0 vulnérabilité | ✅ 0 vulnérabilité |
+| `npm audit` back | 0 vulnérabilité | ✅ 0 vulnérabilité |
+| Build front (`npm run build`) | OK | ✅ OK |
+| Build back (`nest build`) | OK | ✅ OK |
+| Tests Jest | 9/9 verts | ✅ 9/9 verts |
+| Smoke test prod (Vercel + Railway) | OK | ✅ OK |
+
+**Majeures volontairement reportées en V2** (justification de scope examen) :
+
+| Paquet | Actuel | Latest | Pourquoi non appliquée |
+|---|---|---|---|
+| `prisma` + `@prisma/client` | 6.19.3 | 7.8.0 | Migration majeure, breaking changes sur le client TypeScript généré — risque de régression sur la couche d'accès aux données. À planifier en V2 avec un sprint dédié. |
+| `typescript` | 5.9.3 | 6.0.3 | Migration majeure du compilateur, peut casser le typage strict. À évaluer après mise en production stable. |
+| `eslint` | 9.39.4 | 10.5.0 | Migration majeure de la config flat — impact sur tous les fichiers du repo. |
+| `@types/node` | 20 / 24 | 25 | Changement majeur des types Node — peut générer des erreurs TypeScript sur des APIs internes. |
+
+**Démarche reproductible** documentée dans le runbook interne (à intégrer en V2 dans un CI/CD : `npm audit` + `npm outdated` quotidiens automatiques).
+
 ### 7.2.3 Détails sur les risques IA (OWASP LLM Top 10)
 
 L'application Nautilus intègre un agent IA, ce qui ouvre une **surface d'attaque spécifique** différente des applications web classiques. J'ai cartographié les 10 risques de l'OWASP LLM Top 10 et la couverture de Nautilus :

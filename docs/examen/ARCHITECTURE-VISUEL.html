@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Architecture Nautilus — Schéma visuel</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f5f7fb;
+    color: #0F4761;
+    padding: 32px;
+    line-height: 1.4;
+  }
+  h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    color: #0F4761;
+  }
+  h2 {
+    font-size: 18px;
+    margin: 32px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #0F4761;
+    color: #0F4761;
+  }
+  .intro {
+    background: white;
+    padding: 16px 20px;
+    border-left: 4px solid #0F4761;
+    border-radius: 4px;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .schema {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+  }
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 12px;
+  }
+  .legend div {
+    padding: 8px;
+    border-radius: 4px;
+    text-align: center;
+    color: white;
+    font-weight: 600;
+  }
+  .l-front { background: #2196F3; }
+  .l-back { background: #0F4761; }
+  .l-bdd-sql { background: #336791; }
+  .l-bdd-nosql { background: #47A248; }
+  .l-auth { background: #3ECF8E; color: #0F4761; }
+  .l-llm { background: #FF6B35; }
+
+  .flow {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .flow h3 {
+    color: #0F4761;
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  .flow ol {
+    padding-left: 24px;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .flow ol li::marker {
+    font-weight: 700;
+    color: #0F4761;
+  }
+  .highlight {
+    background: #fff3cd;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .key-point {
+    background: #d1ecf1;
+    border-left: 3px solid #0c5460;
+    padding: 8px 12px;
+    margin-top: 10px;
+    font-size: 12px;
+  }
+  .who-does-what {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .actor {
+    background: white;
+    border-radius: 6px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .actor h4 {
+    color: #0F4761;
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .actor h4 .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .actor p {
+    font-size: 12px;
+    color: #555;
+    margin-top: 4px;
+  }
+  .actor .role {
+    font-weight: 600;
+    color: #0F4761;
+  }
+  @media print {
+    body { background: white; padding: 16px; }
+    .schema, .flow, .actor { box-shadow: none; border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🌊 Architecture Nautilus — Schéma visuel</h1>
+<p style="color: #666; font-size: 14px; margin-bottom: 24px;">
+  Carte de l'architecture à mémoriser. <strong>Qui agit sur quoi.</strong> Une page A4 imprimable.
+</p>
+
+<div class="intro">
+  <strong>Lecture rapide :</strong> chaque brique colorée a un rôle unique. Les flèches indiquent <em>qui parle à qui</em> et avec quel protocole. La règle d'or : <span class="highlight">le LLM ne touche jamais la base de données</span> — il classifie une question, et c'est mon code NestJS qui exécute la requête Prisma typée correspondante.
+</div>
+
+<h2>📐 Schéma global</h2>
+
+<div class="schema">
+<svg viewBox="0 0 1200 720" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, sans-serif">
+  <!-- Définitions des flèches -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0F4761"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#FF6B35"/>
+    </marker>
+  </defs>
+
+  <!-- Navigateur (en haut au centre) -->
+  <rect x="500" y="20" width="200" height="60" rx="8" fill="#E3F2FD" stroke="#2196F3" stroke-width="2"/>
+  <text x="600" y="45" text-anchor="middle" font-size="14" font-weight="700" fill="#0F4761">🌐 Navigateur</text>
+  <text x="600" y="65" text-anchor="middle" font-size="11" fill="#555">Chrome / Safari / Firefox</text>
+
+  <!-- Flèche Navigateur → Front -->
+  <line x1="600" y1="80" x2="600" y2="130" stroke="#0F4761" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="615" y="110" font-size="10" fill="#555">HTTPS + cookie JWT</text>
+
+  <!-- Front Next.js (large bandeau) -->
+  <rect x="200" y="140" width="800" height="100" rx="8" fill="#2196F3" stroke="#1976D2" stroke-width="2"/>
+  <text x="600" y="170" text-anchor="middle" font-size="16" font-weight="700" fill="white">FRONT — Next.js 16 (Vercel europe)</text>
+  <text x="600" y="195" text-anchor="middle" font-size="11" fill="white">Server Components (rendu HTML pré-auth) · Client Components (interactif)</text>
+  <text x="600" y="215" text-anchor="middle" font-size="11" fill="white">Zod (validation form) · TanStack Query (cache API) · Cookies httpOnly</text>
+
+  <!-- Flèche Front → Back -->
+  <line x1="600" y1="240" x2="600" y2="290" stroke="#0F4761" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="615" y="270" font-size="10" fill="#555">HTTPS + Bearer JWT</text>
+
+  <!-- Back NestJS (large bandeau) -->
+  <rect x="200" y="300" width="800" height="120" rx="8" fill="#0F4761" stroke="#082A3A" stroke-width="2"/>
+  <text x="600" y="330" text-anchor="middle" font-size="16" font-weight="700" fill="white">BACK — NestJS 11 (Railway europe-west4)</text>
+  <text x="600" y="355" text-anchor="middle" font-size="11" fill="white">9 modules métier (clients, bateaux, devis, OR, IA, log, auth, pdf, prisma)</text>
+  <text x="600" y="375" text-anchor="middle" font-size="11" fill="white">Guards JWT ES256 · Throttler · Helmet · CORS strict · class-validator</text>
+  <text x="600" y="395" text-anchor="middle" font-size="11" fill="white">Prisma 6 (ORM type-safe) · Mongoose 9 · pdfkit (PDF côté serveur)</text>
+
+  <!-- Flèches Back → 4 services -->
+
+  <!-- Back → PostgreSQL (en bas à gauche) -->
+  <line x1="350" y1="420" x2="200" y2="490" stroke="#0F4761" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="220" y="460" font-size="10" fill="#555">Prisma type-safe</text>
+
+  <!-- Back → MongoDB (en bas centre-gauche) -->
+  <line x1="500" y1="420" x2="450" y2="490" stroke="#0F4761" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="445" y="460" font-size="10" fill="#555">Mongoose</text>
+
+  <!-- Back → Supabase (en bas centre-droit) -->
+  <line x1="700" y1="420" x2="750" y2="490" stroke="#0F4761" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="710" y="460" font-size="10" fill="#555">JWKS lookup</text>
+
+  <!-- Back → Mistral (en bas à droite) -->
+  <line x1="850" y1="420" x2="1000" y2="490" stroke="#FF6B35" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <text x="900" y="460" font-size="10" fill="#FF6B35" font-weight="600">Question → Intent</text>
+
+  <!-- PostgreSQL -->
+  <rect x="50" y="500" width="200" height="100" rx="8" fill="#336791" stroke="#2A4F71" stroke-width="2"/>
+  <text x="150" y="525" text-anchor="middle" font-size="14" font-weight="700" fill="white">🐘 PostgreSQL</text>
+  <text x="150" y="545" text-anchor="middle" font-size="11" fill="white">Neon (Frankfurt)</text>
+  <text x="150" y="565" text-anchor="middle" font-size="10" fill="white">4 entités métier liées</text>
+  <text x="150" y="580" text-anchor="middle" font-size="10" fill="white">+ 1 entité technique</text>
+  <text x="150" y="595" text-anchor="middle" font-size="10" fill="white" font-style="italic">ACID, relations fortes</text>
+
+  <!-- MongoDB -->
+  <rect x="300" y="500" width="200" height="100" rx="8" fill="#47A248" stroke="#388E3C" stroke-width="2"/>
+  <text x="400" y="525" text-anchor="middle" font-size="14" font-weight="700" fill="white">🍃 MongoDB Atlas</text>
+  <text x="400" y="545" text-anchor="middle" font-size="11" fill="white">Région Paris</text>
+  <text x="400" y="565" text-anchor="middle" font-size="10" fill="white">Logs IA (recherche_logs)</text>
+  <text x="400" y="580" text-anchor="middle" font-size="10" fill="white">Schéma flexible</text>
+  <text x="400" y="595" text-anchor="middle" font-size="10" fill="white" font-style="italic">Audit RGPD éditeur</text>
+
+  <!-- Supabase Auth -->
+  <rect x="700" y="500" width="200" height="100" rx="8" fill="#3ECF8E" stroke="#2EA47A" stroke-width="2"/>
+  <text x="800" y="525" text-anchor="middle" font-size="14" font-weight="700" fill="#0F4761">🔐 Supabase Auth</text>
+  <text x="800" y="545" text-anchor="middle" font-size="11" fill="#0F4761">Région Paris</text>
+  <text x="800" y="565" text-anchor="middle" font-size="10" fill="#0F4761">JWT ES256 asymétrique</text>
+  <text x="800" y="580" text-anchor="middle" font-size="10" fill="#0F4761">Clé privée chez eux</text>
+  <text x="800" y="595" text-anchor="middle" font-size="10" fill="#0F4761" font-style="italic">JWKS public exposé</text>
+
+  <!-- Mistral AI -->
+  <rect x="950" y="500" width="200" height="100" rx="8" fill="#FF6B35" stroke="#E65322" stroke-width="2"/>
+  <text x="1050" y="525" text-anchor="middle" font-size="14" font-weight="700" fill="white">🇫🇷 Mistral AI</text>
+  <text x="1050" y="545" text-anchor="middle" font-size="11" fill="white">France — souverain</text>
+  <text x="1050" y="565" text-anchor="middle" font-size="10" fill="white">mistral-small-latest</text>
+  <text x="1050" y="580" text-anchor="middle" font-size="10" fill="white">CLASSIFIER seulement</text>
+  <text x="1050" y="595" text-anchor="middle" font-size="10" fill="white" font-style="italic">Zéro pouvoir SQL</text>
+
+  <!-- Bandeau bas - règle d'or -->
+  <rect x="50" y="640" width="1100" height="60" rx="8" fill="#FFF3CD" stroke="#FFA000" stroke-width="2"/>
+  <text x="600" y="665" text-anchor="middle" font-size="13" font-weight="700" fill="#0F4761">⚠️ RÈGLE D'OR D'ARCHITECTURE</text>
+  <text x="600" y="685" text-anchor="middle" font-size="11" fill="#0F4761">Le LLM Mistral ne génère JAMAIS de SQL. Il choisit dans 23 intents pré-codés. Mon code Prisma typé exécute la requête. → Pas d'injection SQL possible via le prompt.</text>
+
+</svg>
+
+<div class="legend">
+  <div class="l-front">🌐 Navigateur / Front</div>
+  <div class="l-back">⚙️ Back (NestJS)</div>
+  <div class="l-bdd-sql">🐘 BDD SQL</div>
+  <div class="l-bdd-nosql">🍃 BDD NoSQL</div>
+  <div class="l-auth">🔐 Auth (Supabase)</div>
+  <div class="l-llm">🤖 LLM (Mistral)</div>
+</div>
+</div>
+
+<h2>👥 Qui agit sur quoi — vue acteur</h2>
+
+<div class="who-does-what">
+  <div class="actor">
+    <h4><span class="dot" style="background: #2196F3;"></span>Front Next.js</h4>
+    <p class="role">Affiche, valide, appelle</p>
+    <p>Rend les pages HTML, valide les formulaires avec Zod côté navigateur, envoie les requêtes au back avec le cookie JWT. Ne touche JAMAIS la BDD directement.</p>
+  </div>
+  <div class="actor">
+    <h4><span class="dot" style="background: #0F4761;"></span>Back NestJS</h4>
+    <p class="role">Orchestre, sécurise, exécute</p>
+    <p>Vérifie le JWT, valide les DTO, parle aux BDD via Prisma/Mongoose, appelle Mistral pour la classification, génère les PDFs avec pdfkit. Le chef d'orchestre.</p>
+  </div>
+  <div class="actor">
+    <h4><span class="dot" style="background: #336791;"></span>PostgreSQL (Neon)</h4>
+    <p class="role">Garde les données métier</p>
+    <p>Client, Bateau, Devis, OR + LigneDevis. ACID, relations fortes, intégrité référentielle. Ne dialogue qu'avec le back via Prisma.</p>
+  </div>
+  <div class="actor">
+    <h4><span class="dot" style="background: #47A248;"></span>MongoDB Atlas</h4>
+    <p class="role">Trace toutes les recherches IA</p>
+    <p>Un document par requête (question, intent, entities, temps, statut). Audit RGPD côté éditeur RANKIA. Schéma flexible car les entities varient par intent.</p>
+  </div>
+  <div class="actor">
+    <h4><span class="dot" style="background: #3ECF8E;"></span>Supabase Auth</h4>
+    <p class="role">Signe et publie</p>
+    <p>Signe les JWT à la connexion (avec sa clé privée), publie la clé publique via JWKS. Le back vérifie sans connaître le secret. La clé privée ne quitte JAMAIS Supabase.</p>
+  </div>
+  <div class="actor">
+    <h4><span class="dot" style="background: #FF6B35;"></span>Mistral AI</h4>
+    <p class="role">Classifie les questions</p>
+    <p>Reçoit la question en français + le prompt système, renvoie un intent (parmi 23) + des entités extraites. AUCUN pouvoir d'écriture. AUCUN accès BDD. Juste un classifier intelligent.</p>
+  </div>
+</div>
+
+<h2>🔄 Les 3 flows à mémoriser</h2>
+
+<div class="flow">
+  <h3>Flow 1 — Authentification (qui parle à qui)</h3>
+  <ol>
+    <li>L'utilisateur tape email + mot de passe sur la page <span class="highlight">login</span></li>
+    <li>Le front envoie ces creds à <span class="highlight">Supabase</span></li>
+    <li>Supabase vérifie, signe un JWT avec sa <span class="highlight">clé privée ES256</span></li>
+    <li>Le front reçoit le JWT, le stocke dans un <span class="highlight">cookie httpOnly</span></li>
+    <li>À chaque requête vers le back, le cookie est envoyé</li>
+    <li>Le back récupère la <span class="highlight">clé publique</span> Supabase via JWKS</li>
+    <li>Le back vérifie la signature du JWT avec la clé publique</li>
+    <li>Si valide → autorisé. Sinon → 401</li>
+  </ol>
+  <div class="key-point">
+    <strong>Point fort :</strong> la clé privée ne quitte jamais Supabase. Si mon back est compromis, l'attaquant ne peut PAS forger de token.
+  </div>
+</div>
+
+<div class="flow">
+  <h3>Flow 2 — Création client + bateau (CRUD typique)</h3>
+  <ol>
+    <li>L'utilisateur remplit le formulaire <span class="highlight">React Hook Form</span></li>
+    <li><span class="highlight">Zod</span> valide les champs côté navigateur (UX immédiate)</li>
+    <li>Si OK, le front envoie <code>POST /api/clients</code> avec le JWT</li>
+    <li>NestJS reçoit, passe par le <span class="highlight">Guard JWT ES256</span> (auth ?)</li>
+    <li>NestJS passe par le DTO + <span class="highlight">class-validator</span> (données valides ?)</li>
+    <li>NestJS appelle ClientsService → <span class="highlight">Prisma</span> → PostgreSQL</li>
+    <li>PostgreSQL crée la ligne, applique les CHECK / FOREIGN KEY</li>
+    <li>NestJS renvoie le client créé en JSON</li>
+    <li>Le front met à jour le cache TanStack Query, affiche la fiche</li>
+  </ol>
+  <div class="key-point">
+    <strong>Défense en profondeur :</strong> si quelqu'un bypass le front, le DTO refuse. Si le DTO est bypass, Prisma refuse. Si Prisma est bypass, PostgreSQL refuse. Quatre étages.
+  </div>
+</div>
+
+<div class="flow">
+  <h3>Flow 3 — Recherche IA (le cœur du projet)</h3>
+  <ol>
+    <li>L'utilisateur tape « <span class="highlight">le bateau de Martin</span> »</li>
+    <li>Le front envoie <code>POST /api/recherche-ia { question }</code></li>
+    <li>NestJS vérifie le JWT (Guard), valide le DTO</li>
+    <li>Le service construit le prompt système + envoie à <span class="highlight">Mistral</span></li>
+    <li>Mistral répond : <code>{ intent: "find_bateau", entities: { client_name: "Martin" } }</code></li>
+    <li>Mon code <strong>switch sur l'intent</strong> → appelle Prisma avec un WHERE typé</li>
+    <li>PostgreSQL renvoie les bateaux trouvés</li>
+    <li><strong>En parallèle</strong> : un log MongoDB est créé (userId, question, intent, entities, temps, statut)</li>
+    <li>NestJS renvoie au front : <code>{ intent, results, messageInfo }</code></li>
+    <li>Le front affiche le bandeau adaptatif + la liste des bateaux</li>
+  </ol>
+  <div class="key-point">
+    <strong>Point fort :</strong> à AUCUN moment Mistral ne touche à la BDD. Il ne fait que classifier. La sécurité est par <em>design</em>, pas par <em>filtre</em>.
+  </div>
+</div>
+
+<h2>📚 Glossaire technique — tous les termes utilisés</h2>
+<p style="font-size: 13px; color: #555; margin-bottom: 16px;">
+  Pour chaque acronyme : <strong>ce que ça veut dire</strong>, <strong>ce que ça fait</strong>, et <strong>où c'est dans Nautilus</strong>.
+</p>
+
+<style>
+  .gloss-cat {
+    background: white;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .gloss-cat h3 {
+    color: #0F4761;
+    font-size: 15px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e0e7ef;
+  }
+  .gloss-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .gloss-term {
+    background: #f8fafc;
+    border-left: 3px solid #0F4761;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .gloss-term .name {
+    font-weight: 700;
+    color: #0F4761;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .gloss-term .full {
+    color: #888;
+    font-style: italic;
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+  .gloss-term .does {
+    margin-bottom: 4px;
+  }
+  .gloss-term .where {
+    color: #0F4761;
+    font-size: 11px;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px dashed #ccd6e0;
+  }
+</style>
+
+<!-- 1. AUTHENTIFICATION & SÉCURITÉ -->
+<div class="gloss-cat">
+  <h3>🔐 1. Authentification & Sécurité</h3>
+  <div class="gloss-grid">
+    <div class="gloss-term">
+      <div class="name">JWT</div>
+      <div class="full">JSON Web Token</div>
+      <div class="does">Un petit fichier texte signé numériquement qui prouve qui tu es. Quand tu te connectes, Supabase t'en donne un, et le back le vérifie à chaque requête.</div>
+      <div class="where">→ Stocké en cookie httpOnly, envoyé à chaque appel API</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">ES256</div>
+      <div class="full">Elliptic Curve Signature 256 bits</div>
+      <div class="does">Une méthode de signature <strong>asymétrique</strong> : une clé privée signe, une clé publique vérifie. C'est ultra-sécurisé.</div>
+      <div class="where">→ Le format de signature des JWT Supabase</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">JWKS</div>
+      <div class="full">JSON Web Key Set</div>
+      <div class="does">Un endpoint web public qui expose la <strong>clé publique</strong> de Supabase. Mon back va la chercher pour vérifier les JWT.</div>
+      <div class="where">→ Le mécanisme par lequel le back vérifie les tokens sans connaître le secret</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">httpOnly</div>
+      <div class="full">(cookie)</div>
+      <div class="does">Un cookie marqué httpOnly est <strong>invisible pour JavaScript</strong>. Donc même si une faille XSS existe, l'attaquant ne peut pas voler le JWT.</div>
+      <div class="where">→ Tous mes cookies d'auth</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">CORS</div>
+      <div class="full">Cross-Origin Resource Sharing</div>
+      <div class="does">Une règle du navigateur qui empêche un site A d'appeler l'API du site B sans permission. Je liste explicitement les origines autorisées.</div>
+      <div class="where">→ Configuré dans NestJS (n'accepte que vercel.app et localhost)</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">CSP</div>
+      <div class="full">Content Security Policy</div>
+      <div class="does">Un header HTTP qui dit au navigateur quels scripts, images et iframes il a le droit de charger. Bloque les injections de code malveillant.</div>
+      <div class="where">→ Posé par Helmet sur toutes les réponses</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">HSTS</div>
+      <div class="full">HTTP Strict Transport Security</div>
+      <div class="does">Un header qui force le navigateur à toujours utiliser HTTPS, jamais HTTP. Anti man-in-the-middle.</div>
+      <div class="where">→ Posé par Helmet</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">bcrypt</div>
+      <div class="full">(algorithme de hash)</div>
+      <div class="does">Une fonction qui transforme un mot de passe en un hash impossible à inverser. Même si ma BDD fuite, on ne récupère pas les mots de passe.</div>
+      <div class="where">→ Utilisé par Supabase pour stocker les mots de passe</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">TLS</div>
+      <div class="full">Transport Layer Security</div>
+      <div class="does">Le protocole qui chiffre les communications entre ton navigateur et un serveur (c'est ce qui fait le « S » de HTTPS).</div>
+      <div class="where">→ Activé par défaut sur Vercel et Railway</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Guard</div>
+      <div class="full">(NestJS)</div>
+      <div class="does">Une fonction qui s'exécute <strong>avant</strong> ton code métier et qui dit « stop » si quelque chose ne va pas (token invalide, mauvais rôle…).</div>
+      <div class="where">→ J'ai un SupabaseJwtGuard global sur toutes les routes protégées</div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. BACK-END -->
+<div class="gloss-cat">
+  <h3>⚙️ 2. Back-end (API, NestJS, données)</h3>
+  <div class="gloss-grid">
+    <div class="gloss-term">
+      <div class="name">API</div>
+      <div class="full">Application Programming Interface</div>
+      <div class="does">Le mécanisme par lequel deux logiciels se parlent. Mon back expose une API REST que le front utilise.</div>
+      <div class="where">→ <code>https://nautilus-back.railway.app/api/*</code></div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">REST</div>
+      <div class="full">Representational State Transfer</div>
+      <div class="does">Un style d'API standard : tu utilises les verbes HTTP (GET, POST, PATCH, DELETE) pour manipuler des ressources.</div>
+      <div class="where">→ Mes endpoints suivent REST : GET /clients, POST /devis…</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">DTO</div>
+      <div class="full">Data Transfer Object</div>
+      <div class="does">Un objet TypeScript qui décrit la forme exacte d'une donnée entrante. Si un champ ne correspond pas, le back refuse la requête.</div>
+      <div class="where">→ Tous mes endpoints ont un DTO avec class-validator</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">class-validator</div>
+      <div class="full">(librairie NestJS)</div>
+      <div class="does">Une bibliothèque qui lit les annotations sur mes DTO (<code>@IsEmail()</code>, <code>@Length(2, 50)</code>) et rejette toute requête malformée.</div>
+      <div class="where">→ Sur tous mes DTO. C'est mon mur de validation côté back.</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">ORM</div>
+      <div class="full">Object-Relational Mapper</div>
+      <div class="does">Un outil qui me permet d'écrire des requêtes BDD en TypeScript au lieu de SQL brut. C'est plus sûr et plus lisible.</div>
+      <div class="where">→ Prisma 6 pour PostgreSQL, Mongoose pour MongoDB</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Throttler</div>
+      <div class="full">(NestJS)</div>
+      <div class="does">Un module qui limite le nombre de requêtes par IP. Si quelqu'un essaie de brute-force mon login, il est bloqué.</div>
+      <div class="where">→ 100 req/min par IP en global</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Helmet</div>
+      <div class="full">(librairie sécurité)</div>
+      <div class="does">Une bibliothèque qui ajoute automatiquement tous les bons headers HTTP de sécurité (CSP, HSTS, X-Frame-Options…).</div>
+      <div class="where">→ Activée en début de pipeline NestJS</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Module</div>
+      <div class="full">(NestJS)</div>
+      <div class="does">Une boîte qui regroupe Controller + Service + DTO autour d'un domaine métier. J'ai 9 modules métier dans Nautilus.</div>
+      <div class="where">→ ClientsModule, DevisModule, RechercheIaModule…</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Controller</div>
+      <div class="full">(NestJS)</div>
+      <div class="does">La classe qui reçoit les requêtes HTTP, déclare les routes et délègue le travail au Service. C'est la "porte d'entrée" du module.</div>
+      <div class="where">→ Un par module métier : ClientsController, etc.</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Service</div>
+      <div class="full">(NestJS)</div>
+      <div class="does">La classe qui contient la <strong>logique métier</strong>. Le Controller appelle le Service qui fait le vrai travail (calculs, accès BDD).</div>
+      <div class="where">→ ClientsService.create(), DevisService.calculTVA()…</div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. FRONT-END -->
+<div class="gloss-cat">
+  <h3>🎨 3. Front-end (Next.js, React)</h3>
+  <div class="gloss-grid">
+    <div class="gloss-term">
+      <div class="name">SPA</div>
+      <div class="full">Single Page Application</div>
+      <div class="does">Une appli web où la navigation se fait sans recharger la page. Plus fluide qu'un site classique.</div>
+      <div class="where">→ Nautilus est une SPA grâce à Next.js App Router</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Server Component</div>
+      <div class="full">(Next.js)</div>
+      <div class="does">Un composant React rendu <strong>côté serveur</strong> avant d'être envoyé au navigateur. Plus rapide et plus sécurisé.</div>
+      <div class="where">→ Toutes mes pages de liste et de détail</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Client Component</div>
+      <div class="full">(Next.js)</div>
+      <div class="does">Un composant React rendu <strong>côté navigateur</strong>. Nécessaire pour l'interactivité (formulaires, animations).</div>
+      <div class="where">→ Mes formulaires et la barre de recherche IA</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">App Router</div>
+      <div class="full">(Next.js)</div>
+      <div class="does">Le système de routes de Next.js 16 basé sur la structure des dossiers : <code>app/dashboard/clients/page.tsx</code> devient <code>/dashboard/clients</code>.</div>
+      <div class="where">→ Toutes mes routes Nautilus suivent ce modèle</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Zod</div>
+      <div class="full">(librairie de validation)</div>
+      <div class="does">Une bibliothèque TypeScript qui valide des données contre un schéma. Si le champ n'est pas valide, j'affiche une erreur dans le formulaire.</div>
+      <div class="where">→ Tous mes formulaires React Hook Form</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">React Hook Form</div>
+      <div class="full">(librairie React)</div>
+      <div class="does">Gère l'état des formulaires de manière performante. Couplé à Zod, c'est le standard 2025 pour les formulaires React.</div>
+      <div class="where">→ Création client, bateau, devis, etc.</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">TanStack Query</div>
+      <div class="full">(ex React Query)</div>
+      <div class="does">Une bibliothèque qui met en cache les requêtes API et les rafraîchit intelligemment. Évite les appels inutiles.</div>
+      <div class="where">→ Toutes mes requêtes vers l'API back</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">CDN</div>
+      <div class="full">Content Delivery Network</div>
+      <div class="does">Un réseau de serveurs distribués mondialement qui servent les fichiers au plus près de l'utilisateur. Très rapide.</div>
+      <div class="where">→ Vercel fournit le CDN edge automatiquement</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Tailwind CSS</div>
+      <div class="full">(framework CSS)</div>
+      <div class="does">Un système de classes utilitaires (<code>bg-blue-500</code>, <code>p-4</code>) qui me permet de styliser sans écrire de CSS.</div>
+      <div class="where">→ Tout le style de Nautilus en Tailwind v4</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">XSS</div>
+      <div class="full">Cross-Site Scripting</div>
+      <div class="does">Une attaque où un attaquant injecte du JavaScript malveillant dans une page. Cookies httpOnly + CSP me protègent.</div>
+      <div class="where">→ Risque OWASP A03 traité par design</div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. BASES DE DONNÉES -->
+<div class="gloss-cat">
+  <h3>🗄 4. Bases de données</h3>
+  <div class="gloss-grid">
+    <div class="gloss-term">
+      <div class="name">PostgreSQL</div>
+      <div class="full">(BDD relationnelle)</div>
+      <div class="does">La base de données la plus solide du marché open source. Stocke des données en tables avec des relations entre elles.</div>
+      <div class="where">→ Hébergée chez Neon, Frankfurt</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">MongoDB</div>
+      <div class="full">(BDD documentaire)</div>
+      <div class="does">Une base NoSQL qui stocke des documents JSON. Très flexible : pas besoin de schéma rigide.</div>
+      <div class="where">→ Hébergée chez Atlas, Paris. Stocke les logs IA.</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">ACID</div>
+      <div class="full">Atomicity, Consistency, Isolation, Durability</div>
+      <div class="does">Les 4 garanties d'une BDD relationnelle : tes transactions sont fiables, même en cas de crash. PostgreSQL est ACID.</div>
+      <div class="where">→ Garantit que la création devis + OR + ligne fonctionne ou échoue ensemble</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">SQL</div>
+      <div class="full">Structured Query Language</div>
+      <div class="does">Le langage standard pour interroger une BDD relationnelle. Mais je n'écris pas de SQL à la main — Prisma le génère pour moi.</div>
+      <div class="where">→ Généré automatiquement par Prisma</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">NoSQL</div>
+      <div class="full">Not Only SQL</div>
+      <div class="does">Les BDD qui ne suivent pas le modèle relationnel. Plus flexibles, mais moins de garanties que SQL.</div>
+      <div class="where">→ MongoDB pour mes logs IA</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">CRUD</div>
+      <div class="full">Create, Read, Update, Delete</div>
+      <div class="does">Les 4 opérations de base sur une donnée. Mes formulaires Nautilus font tous du CRUD.</div>
+      <div class="where">→ POST (create), GET (read), PATCH (update), DELETE</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Migration</div>
+      <div class="full">(Prisma)</div>
+      <div class="does">Un fichier SQL généré quand je modifie le schéma. Permet de versionner l'évolution de la BDD comme du code.</div>
+      <div class="where">→ Dossier <code>backend/prisma/migrations/</code></div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Foreign Key</div>
+      <div class="full">Clé étrangère SQL</div>
+      <div class="does">Un lien qui dit « ce bateau appartient à ce client ». Si je supprime le client, je peux automatiquement supprimer ses bateaux (cascade).</div>
+      <div class="where">→ Client → Bateau, Bateau → Devis, etc.</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Index</div>
+      <div class="full">(BDD)</div>
+      <div class="does">Une structure qui accélère les recherches sur une colonne. Sans index, une recherche par nom prend longtemps. Avec, c'est instantané.</div>
+      <div class="where">→ Index sur Client(nom, prenom), Bateau(plaqueMoteur)</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Mongoose</div>
+      <div class="full">(ODM MongoDB)</div>
+      <div class="does">L'équivalent de Prisma pour MongoDB. Me permet de définir un schéma TypeScript pour mes documents.</div>
+      <div class="where">→ Modèle <code>RechercheLog</code> pour les logs IA</div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. LLM & IA -->
+<div class="gloss-cat">
+  <h3>🤖 5. LLM & Intelligence artificielle</h3>
+  <div class="gloss-grid">
+    <div class="gloss-term">
+      <div class="name">LLM</div>
+      <div class="full">Large Language Model</div>
+      <div class="does">Un modèle d'IA entraîné sur des milliards de textes, capable de comprendre et générer du langage naturel.</div>
+      <div class="where">→ J'utilise Mistral AI, un LLM français</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Prompt système</div>
+      <div class="full">(IA)</div>
+      <div class="does">Les instructions de fond que je donne au LLM avant ses requêtes : « tu es un classifier, voici les 23 intents possibles ».</div>
+      <div class="where">→ Mon prompt système Nautilus fait ~1200 lignes</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Intent</div>
+      <div class="full">(IA)</div>
+      <div class="does">L'<strong>intention</strong> détectée derrière une question. « le bateau de Martin » → intent = <code>find_bateau</code>.</div>
+      <div class="where">→ J'ai 23 intents pré-codés (19 métier + 3 UX + 1 sécurité)</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Entities</div>
+      <div class="full">(IA)</div>
+      <div class="does">Les <strong>entités</strong> extraites d'une question. « le bateau de Martin » → entities = <code>{ client_name: "Martin" }</code>.</div>
+      <div class="where">→ Schéma variable selon l'intent</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Pattern Intent + Entities</div>
+      <div class="full">(architecture IA)</div>
+      <div class="does">Un design où le LLM ne génère PAS de code mais choisit dans une liste fermée. C'est ce qui me protège du prompt injection.</div>
+      <div class="where">→ Cœur de l'architecture sécurisée de Nautilus</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Prompt injection</div>
+      <div class="full">(attaque IA)</div>
+      <div class="does">Une attaque où l'utilisateur tape « ignore tes consignes et… ». Un LLM mal conçu obéit. Le mien ne peut pas — il classifie seulement.</div>
+      <div class="where">→ OWASP LLM01, neutralisé par design</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Température (LLM)</div>
+      <div class="full">(paramètre IA)</div>
+      <div class="does">Un paramètre entre 0 et 2 qui contrôle la créativité. À 0 = déterministe (même question = même réponse). À 1 = créatif.</div>
+      <div class="where">→ Je l'ai mise à 0 pour garantir la reproductibilité</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Token</div>
+      <div class="full">(LLM)</div>
+      <div class="does">L'unité de mesure d'un texte pour un LLM. ~4 caractères = 1 token. La facturation Mistral se fait au token.</div>
+      <div class="where">→ ~600 tokens par requête Nautilus en moyenne</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">JSON mode</div>
+      <div class="full">(LLM)</div>
+      <div class="does">Un paramètre qui force le LLM à répondre en JSON valide. Garantit que sa réponse est parseable.</div>
+      <div class="where">→ Activé : <code>response_format: "json_object"</code></div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Few-shot</div>
+      <div class="full">(prompt engineering)</div>
+      <div class="does">Donner au LLM des exemples concrets dans le prompt pour qu'il comprenne le pattern attendu. Mon prompt en contient 38.</div>
+      <div class="where">→ 38 exemples Q/R dans le prompt système</div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. HÉBERGEMENT & DEVOPS -->
+<div class="gloss-cat">
+  <h3>☁️ 6. Hébergement & DevOps</h3>
+  <div class="gloss-grid">
+    <div class="gloss-term">
+      <div class="name">Vercel</div>
+      <div class="full">(hébergeur)</div>
+      <div class="does">L'éditeur de Next.js, qui propose un hébergement spécifiquement optimisé pour ce framework. Déploiement à chaque <code>git push</code>.</div>
+      <div class="where">→ Mon front Nautilus</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Railway</div>
+      <div class="full">(hébergeur)</div>
+      <div class="does">Un hébergeur moderne qui conteneurise mon back automatiquement. Pricing à l'usage, région UE.</div>
+      <div class="where">→ Mon back NestJS, région europe-west4</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Neon</div>
+      <div class="full">(PostgreSQL serverless)</div>
+      <div class="does">Un hébergeur PostgreSQL qui scale automatiquement et qui peut s'éteindre quand personne n'utilise → économique.</div>
+      <div class="where">→ Ma BDD métier, région Frankfurt</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">MongoDB Atlas</div>
+      <div class="full">(MongoDB managé)</div>
+      <div class="does">Le service officiel MongoDB qui gère l'hébergement, la sauvegarde, la sécurité. Tier gratuit suffisant pour Nautilus.</div>
+      <div class="where">→ Mes logs IA, région Paris</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">CI/CD</div>
+      <div class="full">Continuous Integration / Continuous Deployment</div>
+      <div class="does">Un pipeline automatique qui teste mon code à chaque push et le déploie en prod si tout est vert.</div>
+      <div class="where">→ Implicite via Vercel + Railway (auto-deploy on push main)</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Variables d'environnement</div>
+      <div class="full">(config)</div>
+      <div class="does">Des paramètres qui changent selon l'environnement (dev / prod) : URL de BDD, clé API… Jamais commitées dans Git.</div>
+      <div class="where">→ Stockées dans 1Password, injectées par Vercel/Railway</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">1Password</div>
+      <div class="full">(coffre-fort numérique)</div>
+      <div class="does">Une appli qui stocke mes mots de passe et clés API de manière chiffrée. CLI <code>op</code> pour récupérer un secret en local.</div>
+      <div class="where">→ Vault dédié "nautilus" pour tous les secrets</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">npm audit</div>
+      <div class="full">(commande sécurité)</div>
+      <div class="does">Une commande qui scanne mes dépendances et signale les vulnérabilités connues. Je la lance après chaque <code>npm install</code>.</div>
+      <div class="where">→ 0 CVE actuellement (campagne MAJ 15/06)</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">CVE</div>
+      <div class="full">Common Vulnerabilities and Exposures</div>
+      <div class="does">Un identifiant unique pour chaque vulnérabilité de sécurité connue publiquement. Permet de tracer les failles.</div>
+      <div class="where">→ Référence dans mon audit npm</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">Dependabot</div>
+      <div class="full">(GitHub)</div>
+      <div class="does">Un bot qui surveille mes dépendances et ouvre des Pull Requests automatiques quand une mise à jour de sécurité est dispo.</div>
+      <div class="where">→ Activé sur mon repo GitHub</div>
+    </div>
+  </div>
+</div>
+
+<!-- 7. STANDARDS & RÉFÉRENTIELS -->
+<div class="gloss-cat">
+  <h3>📋 7. Standards & Référentiels</h3>
+  <div class="gloss-grid">
+    <div class="gloss-term">
+      <div class="name">OWASP</div>
+      <div class="full">Open Web Application Security Project</div>
+      <div class="does">Une fondation qui publie les références mondiales de sécurité web. Le « Top 10 » liste les 10 risques majeurs.</div>
+      <div class="where">→ J'ai traité 5 risques sur 10 dans Nautilus (A01, A02, A03, A05, A07)</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">OWASP LLM Top 10</div>
+      <div class="full">(référentiel IA)</div>
+      <div class="does">L'équivalent du Top 10 classique pour les apps qui utilisent un LLM. Publié en 2023, mis à jour en 2025.</div>
+      <div class="where">→ J'ai traité LLM01, LLM02, LLM06, LLM08 dans Nautilus</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">RGPD</div>
+      <div class="full">Règlement Général sur la Protection des Données</div>
+      <div class="does">La loi européenne sur la protection des données personnelles. Impose la traçabilité, le consentement, le droit à l'oubli.</div>
+      <div class="where">→ 100 % infra UE + audit éditeur RANKIA</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">RNCP</div>
+      <div class="full">Répertoire National des Certifications Professionnelles</div>
+      <div class="does">Le registre français qui catalogue tous les diplômes reconnus par l'État. Mon Titre Pro DWWM a le numéro 37674.</div>
+      <div class="where">→ Le titre que je vise le 29/06</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">France Compétences</div>
+      <div class="full">(autorité publique)</div>
+      <div class="does">L'organisme qui gère le RNCP et définit les modalités des titres professionnels. C'est leur site qui dit officiellement « 35 min de présentation ».</div>
+      <div class="where">→ Source légale de la durée de mon oral</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">CERT-FR</div>
+      <div class="full">Centre gouvernemental de veille</div>
+      <div class="does">L'agence nationale française qui publie les alertes de sécurité. Je la consulte dans ma veille hebdo.</div>
+      <div class="where">→ Une de mes 4 sources de veille</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">ACID (rappel)</div>
+      <div class="full">Atomicity, Consistency, Isolation, Durability</div>
+      <div class="does">Garanties d'une BDD relationnelle. PostgreSQL est ACID, MongoDB ne l'est pas (par design).</div>
+      <div class="where">→ PostgreSQL me garantit que mes transactions métier sont fiables</div>
+    </div>
+    <div class="gloss-term">
+      <div class="name">DREETS</div>
+      <div class="full">Direction Régionale, de l'Économie, de l'Emploi, du Travail et des Solidarités</div>
+      <div class="does">L'administration française qui valide et délivre officiellement le Titre Pro après ton examen.</div>
+      <div class="where">→ C'est la DREETS qui me donnera mon diplôme</div>
+    </div>
+  </div>
+</div>
+
+<h2>🎯 Quelle question piège attendre du jury</h2>
+
+<div class="schema">
+<p style="font-size: 13px; margin-bottom: 12px;">
+  Le jury Studi est composé d'un <strong>formateur</strong> et d'un <strong>pro du métier</strong>. Voici les 5 questions techniques les plus probables, avec la réponse-type :
+</p>
+<table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+  <thead>
+    <tr style="background: #0F4761; color: white;">
+      <th style="padding: 8px; text-align: left;">Question piège</th>
+      <th style="padding: 8px; text-align: left;">Réponse-type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid #ddd;">
+      <td style="padding: 8px;"><strong>« Pourquoi pas une seule BDD ? »</strong></td>
+      <td style="padding: 8px;">Le référentiel exige SQL ET NoSQL. J'ai trouvé un cas d'usage légitime pour MongoDB (logs IA semi-structurés) plutôt qu'un cas artificiel.</td>
+    </tr>
+    <tr style="border-bottom: 1px solid #ddd;">
+      <td style="padding: 8px;"><strong>« Pourquoi vous ne stockez pas les PDF ? »</strong></td>
+      <td style="padding: 8px;">Choix volontaire. Régénération à la demande = toujours à jour. Pas de stockage objet à gérer. Le PDF est un format de sortie, pas de stockage.</td>
+    </tr>
+    <tr style="border-bottom: 1px solid #ddd;">
+      <td style="padding: 8px;"><strong>« Et si Mistral est down ? »</strong></td>
+      <td style="padding: 8px;">Le service catch l'erreur, logue en MongoDB, renvoie un message clair. Le reste de l'app continue de fonctionner. Dégradé gracieux.</td>
+    </tr>
+    <tr style="border-bottom: 1px solid #ddd;">
+      <td style="padding: 8px;"><strong>« Pourquoi pas du SSR sur les pages détail ? »</strong></td>
+      <td style="padding: 8px;">J'utilise des Server Components Next.js qui rendent côté serveur APRÈS vérification d'auth. C'est plus sécurisé que du Client Component pur.</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px;"><strong>« Qu'est-ce qui empêche un utilisateur d'injecter du SQL via la recherche IA ? »</strong></td>
+      <td style="padding: 8px;">Le pattern Intent + Entities. Le LLM ne génère AUCUN SQL — il choisit dans 23 intents pré-codés. C'est mon code Prisma typé qui exécute. Risque verrouillé par design.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p style="text-align: center; color: #888; font-size: 12px; margin-top: 32px;">
+  Document de préparation orale — Romain Gaillard — Soutenance TP DWWM 29/06/2026 — Centre Villepinte
+</p>
+
+</body>
+</html>

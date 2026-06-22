@@ -374,7 +374,7 @@ Le diaporama est le **support visuel** de la soutenance orale devant le jury. Il
 
 ## C.2 Critères recommandés (non explicitement formalisés par Studi)
 
-- Durée : couvrir une présentation d'environ 45 minutes
+- Durée : 35 minutes strict (source officielle France Compétences RNCP 37674)
 - Suivre la structure du Dossier Projet (contexte → réalisations → sécurité → bilan)
 - Privilégier les visuels (captures, schémas, diagrammes) aux blocs de texte
 - Inclure une démo live ou enregistrée du projet

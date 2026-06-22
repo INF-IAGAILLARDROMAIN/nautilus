@@ -27,11 +27,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
 
-function formatEuro(value: string | number) {
-  const n = typeof value === "string" ? parseFloat(value) : value;
-  return n.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
-}
-
 // -----------------------------------------------------------------------------
 // Composants de rendu par intent
 // -----------------------------------------------------------------------------
@@ -323,6 +318,7 @@ function RenduStats({ stats }: { stats: StatsGlobal }) {
 // -----------------------------------------------------------------------------
 
 import type { IntentRechercheIa } from "@/lib/api";
+import { formatEuro } from "@/lib/format";
 
 const DATA_INTENTS: ReadonlyArray<IntentRechercheIa> = [
   "find_bateau",

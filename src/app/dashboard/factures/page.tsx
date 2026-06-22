@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { ListPageHeader } from "@/components/list-page-header";
 import { normalizeForSearch } from "@/lib/data/marques";
 import { api, type OrdreReparation } from "@/lib/api";
+import { formatEuro, formatDate } from "@/lib/format";
 
 async function downloadFacture(or: OrdreReparation) {
   if (!or.numeroFacture) return;
@@ -37,22 +38,6 @@ async function downloadFacture(or: OrdreReparation) {
       description: (err as Error).message,
     });
   }
-}
-
-function formatEuro(value: string | number) {
-  const n = typeof value === "string" ? parseFloat(value) : value;
-  return n.toLocaleString("fr-FR", {
-    style: "currency",
-    currency: "EUR",
-  });
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
 }
 
 export default function FacturesListPage() {

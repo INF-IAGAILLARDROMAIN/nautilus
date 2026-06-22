@@ -1,7 +1,7 @@
 # Scénario de démo orale — Nautilus
 
 > Document de travail pour la soutenance du **29 juin 2026** à Villepinte.
-> Cible : **~45 min** de présentation (35-40 min effective + tampon) + 15-30 min de questions.
+> Cible : **35 min strict** de présentation projet (épreuve 1) + 40 min d'entretien technique (épreuve 2). Source : France Compétences RNCP 37674.
 > Format : démo live sur MacBook + diaporama de support.
 
 ---
@@ -148,7 +148,7 @@ Enchaîner 6 questions dans cet ordre, en commentant après chaque :
 
 ### Phrase clé à dire pendant la démo IA
 
-> *« Le point important, et c'est ma décision d'architecture la plus structurante : le LLM Mistral ne génère JAMAIS de SQL. Il choisit parmi 20 intents pré-codés. C'est mon code Prisma typé qui exécute la requête. Donc aucun risque d'injection SQL via le prompt. »*
+> *« Le point important, et c'est ma décision d'architecture la plus structurante : le LLM Mistral ne génère JAMAIS de SQL. Il choisit parmi 23 intents pré-codés. C'est mon code Prisma typé qui exécute la requête. Donc aucun risque d'injection SQL via le prompt. »*
 
 **Minute 23-25 — Tampon**
 - Si tout va vite : montrer la liste des factures
@@ -196,7 +196,7 @@ Enchaîner 6 questions dans cet ordre, en commentant après chaque :
 ## 🎤 BLOC 7 (32-35 min) — Bilan + roadmap V2
 
 ### Slides
-11. Bilan en chiffres (4 entités, 9 modules, 20 intents, 9 tests, 100 % UE…)
+11. Bilan en chiffres (4 entités, 9 modules, 23 intents, 9 tests, 100 % UE…)
 12. Roadmap V2 RANKIA commerciale
 
 ### Points à couvrir

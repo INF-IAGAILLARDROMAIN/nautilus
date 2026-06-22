@@ -14,28 +14,28 @@ import {
   AlertTriangle,
   FileText,
   Download,
+  Pencil,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ListPageHeader } from "@/components/list-page-header";
-import { api, type StatutOR } from "@/lib/api";
+import { api, type StatutOR, type TypeOR, type UrgenceOR } from "@/lib/api";
+import { formatEuro, formatDate } from "@/lib/format";
 
-function formatEuro(value: string | number) {
-  const n = typeof value === "string" ? parseFloat(value) : value;
-  return n.toLocaleString("fr-FR", {
-    style: "currency",
-    currency: "EUR",
-  });
-}
+const TYPE_OR_VALUES: TypeOR[] = [
+  "ENTRETIEN",
+  "REPARATION",
+  "HIVERNAGE",
+  "DESHIVERNAGE",
+  "DEPANNAGE",
+];
+const URGENCE_OR_VALUES: UrgenceOR[] = ["NORMAL", "URGENT"];
 
-function formatDate(iso: string | null) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+function toDateInputValue(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 10);
 }
 
 const STATUT_LABELS: Record<
@@ -118,6 +118,12 @@ export default function OrDetailPage({
 
   const queryClient = useQueryClient();
   const [mecanoDraft, setMecanoDraft] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [draftType, setDraftType] = useState<TypeOR>("REPARATION");
+  const [draftUrgence, setDraftUrgence] = useState<UrgenceOR>("NORMAL");
+  const [draftDescription, setDraftDescription] = useState("");
+  const [draftDateDebut, setDraftDateDebut] = useState("");
+  const [draftDateFin, setDraftDateFin] = useState("");
 
   const orQuery = useQuery({
     queryKey: ["or", id],
@@ -159,6 +165,22 @@ export default function OrDetailPage({
     },
     onError: (err) => {
       toast.error("Affectation impossible", {
+        description: (err as Error).message,
+      });
+    },
+  });
+
+  const updateInfos = useMutation({
+    mutationFn: (payload: Parameters<typeof api.or.update>[1]) =>
+      api.or.update(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["or"] });
+      queryClient.invalidateQueries({ queryKey: ["or", id] });
+      toast.success("OR mis à jour");
+      setEditMode(false);
+    },
+    onError: (err) => {
+      toast.error("Mise à jour impossible", {
         description: (err as Error).message,
       });
     },
@@ -225,7 +247,7 @@ export default function OrDetailPage({
                 className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <Play className="h-4 w-4 mr-2" />
-                Démarrer l'intervention
+                Démarrer l&apos;intervention
               </Button>
             )}
 
@@ -312,20 +334,166 @@ export default function OrDetailPage({
           )}
         </section>
 
-        {/* Type + urgence */}
-        <section className="p-4 rounded-xl border bg-card grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
-              Type
-            </p>
-            <p>{TYPES_OR_LABELS[or.type] ?? or.type}</p>
+        {/* Informations modifiables : Type + Urgence + Description + Dates.
+            En lecture : affichage compact. En édition : formulaire complet.
+            Le bouton « Modifier » est masqué quand l'OR est Facturé (clos). */}
+        <section className="p-4 rounded-xl border bg-card space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+              Informations OR
+            </h2>
+            {!editMode && or.statut !== "FACTURE" && (
+              <Button
+                onClick={() => {
+                  setDraftType(or.type);
+                  setDraftUrgence(or.urgence);
+                  setDraftDescription(or.description ?? "");
+                  setDraftDateDebut(toDateInputValue(or.dateDebut));
+                  setDraftDateFin(toDateInputValue(or.dateFin));
+                  setEditMode(true);
+                }}
+                variant="outline"
+                size="sm"
+              >
+                <Pencil className="h-3.5 w-3.5 mr-1.5" />
+                Modifier
+              </Button>
+            )}
           </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
-              Urgence
-            </p>
-            <p>{or.urgence === "URGENT" ? "🚨 Urgent" : "Normal"}</p>
-          </div>
+
+          {editMode ? (
+            <div className="space-y-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <label className="space-y-1.5 block">
+                  <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    Type
+                  </span>
+                  <select
+                    value={draftType}
+                    onChange={(e) => setDraftType(e.target.value as TypeOR)}
+                    className="w-full h-9 rounded-md border bg-background px-3 text-sm"
+                  >
+                    {TYPE_OR_VALUES.map((v) => (
+                      <option key={v} value={v}>
+                        {TYPES_OR_LABELS[v]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="space-y-1.5 block">
+                  <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    Urgence
+                  </span>
+                  <select
+                    value={draftUrgence}
+                    onChange={(e) =>
+                      setDraftUrgence(e.target.value as UrgenceOR)
+                    }
+                    className="w-full h-9 rounded-md border bg-background px-3 text-sm"
+                  >
+                    {URGENCE_OR_VALUES.map((v) => (
+                      <option key={v} value={v}>
+                        {v === "URGENT" ? "🚨 Urgent" : "Normal"}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <label className="space-y-1.5 block">
+                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Description
+                </span>
+                <textarea
+                  value={draftDescription}
+                  onChange={(e) => setDraftDescription(e.target.value)}
+                  placeholder="Détails du travail à effectuer…"
+                  rows={3}
+                  className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                />
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <label className="space-y-1.5 block">
+                  <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    Date début
+                  </span>
+                  <Input
+                    type="date"
+                    value={draftDateDebut}
+                    onChange={(e) => setDraftDateDebut(e.target.value)}
+                  />
+                </label>
+                <label className="space-y-1.5 block">
+                  <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    Date fin
+                  </span>
+                  <Input
+                    type="date"
+                    value={draftDateFin}
+                    onChange={(e) => setDraftDateFin(e.target.value)}
+                  />
+                </label>
+              </div>
+              <div className="flex gap-2 justify-end pt-2 border-t">
+                <Button
+                  onClick={() => setEditMode(false)}
+                  variant="ghost"
+                  size="sm"
+                  disabled={updateInfos.isPending}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  onClick={() => {
+                    const payload: Parameters<typeof api.or.update>[1] = {
+                      type: draftType,
+                      urgence: draftUrgence,
+                      description: draftDescription.trim() || null,
+                    };
+                    if (draftDateDebut)
+                      payload.dateDebut = new Date(draftDateDebut).toISOString();
+                    if (draftDateFin)
+                      payload.dateFin = new Date(draftDateFin).toISOString();
+                    updateInfos.mutate(payload);
+                  }}
+                  disabled={updateInfos.isPending}
+                  size="sm"
+                  className="bg-primary text-primary-foreground"
+                >
+                  {updateInfos.isPending ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                      Enregistrement…
+                    </>
+                  ) : (
+                    "Enregistrer"
+                  )}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                  Type
+                </p>
+                <p>{TYPES_OR_LABELS[or.type] ?? or.type}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                  Urgence
+                </p>
+                <p>{or.urgence === "URGENT" ? "🚨 Urgent" : "Normal"}</p>
+              </div>
+              {or.description && (
+                <div className="col-span-2">
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                    Description
+                  </p>
+                  <p className="whitespace-pre-line">{or.description}</p>
+                </div>
+              )}
+            </div>
+          )}
         </section>
 
         {/* Devis lié */}
@@ -333,7 +501,7 @@ export default function OrDetailPage({
           <section className="p-4 rounded-xl border bg-card space-y-2">
             <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
               <FileText className="h-3 w-3" />
-              Devis d'origine
+              Devis d&apos;origine
             </h2>
             <Link
               href={`/dashboard/devis/${or.devis.id}`}
@@ -371,21 +539,23 @@ export default function OrDetailPage({
           </section>
         )}
 
-        {/* Dates */}
-        <section className="p-4 rounded-xl border bg-card grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
-              Date début
-            </p>
-            <p>{formatDate(or.dateDebut)}</p>
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
-              Date fin
-            </p>
-            <p>{formatDate(or.dateFin)}</p>
-          </div>
-        </section>
+        {/* Dates — masquées en mode édition (elles sont déjà dans le formulaire ci-dessus). */}
+        {!editMode && (
+          <section className="p-4 rounded-xl border bg-card grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                Date début
+              </p>
+              <p>{formatDate(or.dateDebut)}</p>
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                Date fin
+              </p>
+              <p>{formatDate(or.dateFin)}</p>
+            </div>
+          </section>
+        )}
 
         {/* Boutons PDF : OR toujours (document interne pour le mécano) +
             Facture si statut FACTURE (document client). */}

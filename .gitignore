@@ -43,3 +43,13 @@ next-env.d.ts
 # Documents personnels (convocation, dp, notices)
 # NE JAMAIS pousser sur GitHub public
 _personnel/
+
+# Examen Studi — exports binaires générés depuis les .md sources.
+# On garde les Markdown (sources) versionnés ; les PDF/DOCX/PPTX sont
+# regénérables à la demande et déposés directement sur la plateforme Studi.
+docs/examen/dossier-projet/_FINAL/*.pdf
+docs/examen/dossier-projet/_FINAL/*.docx
+docs/examen/dossier-projet/_FINAL/*.pptx
+docs/examen/livraison-studi/*.pdf
+docs/examen/livraison-studi/*.docx
+docs/examen/livraison-studi/*.pptx

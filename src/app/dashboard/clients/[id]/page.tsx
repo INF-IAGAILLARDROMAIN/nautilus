@@ -20,6 +20,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ListPageHeader } from "@/components/list-page-header";
+import { formatEuro, formatDateShort } from "@/lib/format";
 import {
   api,
   type Bateau,
@@ -27,23 +28,6 @@ import {
   type StatutDevis,
   type StatutOR,
 } from "@/lib/api";
-
-function formatEuro(value: string | number) {
-  const n = typeof value === "string" ? parseFloat(value) : value;
-  return n.toLocaleString("fr-FR", {
-    style: "currency",
-    currency: "EUR",
-  });
-}
-
-function formatDate(iso: string | null | undefined) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 const STATUT_DEVIS_BADGE: Record<StatutDevis, { label: string; cls: string }> = {
   BROUILLON: {
@@ -128,7 +112,7 @@ export default function ClientDetailPage({
     <div className="flex min-h-screen flex-col bg-background pb-24">
       <ListPageHeader
         title={`${client.nom.toUpperCase()} ${client.prenom}`}
-        subtitle={`Client depuis le ${formatDate(client.createdAt)}`}
+        subtitle={`Client depuis le ${formatDateShort(client.createdAt)}`}
       />
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-5">
@@ -305,7 +289,7 @@ export default function ClientDetailPage({
                       <p className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          {formatDate(d.createdAt)}
+                          {formatDateShort(d.createdAt)}
                         </span>
                         {d.bateau && (
                           <span>
@@ -394,7 +378,7 @@ export default function ClientDetailPage({
                       {or.numeroFacture ?? "—"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Devis {d.numeroDevis} · {formatDate(or.createdAt)}
+                      Devis {d.numeroDevis} · {formatDateShort(or.createdAt)}
                     </p>
                   </div>
                   <span className="font-bold tabular-nums text-sm">

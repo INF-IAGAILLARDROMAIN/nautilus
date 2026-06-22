@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Anchor,
-  Bell,
   Search,
   Users,
   Ship,
@@ -132,23 +130,16 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-30 bg-primary text-primary-foreground shadow-md">
-        <div className="flex items-center justify-between px-4 py-3 max-w-3xl mx-auto">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 text-primary-foreground"
-          >
-            <Anchor className="h-6 w-6" strokeWidth={2.5} />
-            <span className="text-lg font-bold tracking-tight">Nautilus</span>
-          </Link>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Notifications"
-              className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-            >
-              <Bell className="h-5 w-5" />
-            </Button>
+        <div className="flex items-center gap-3 px-4 py-3 max-w-3xl mx-auto">
+          {/* En mobile, espace réservé pour le bouton hamburger flottant de <MobileNav />. */}
+          <div className="lg:hidden h-9 w-9 shrink-0" aria-hidden="true" />
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg font-bold leading-tight">Tableau de bord</h1>
+            <p className="text-xs text-primary-foreground/80">
+              Vue d&apos;ensemble de l&apos;atelier
+            </p>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
             <div className="text-primary-foreground [&_button]:text-primary-foreground [&_button]:hover:bg-primary-foreground/10 [&_button]:hover:text-primary-foreground">
               <ThemeToggle />
             </div>

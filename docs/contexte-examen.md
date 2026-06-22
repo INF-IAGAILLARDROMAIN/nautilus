@@ -70,7 +70,7 @@ Le TP DWWM se compose de **2 blocs de compétences** :
 
 ## Format de soutenance (estimation)
 
-- ~45 min de présentation (démo + slides)
+- **35 min** de présentation (source : France Compétences RNCP 37674)
 - ~15-30 min de questions-réponses jury
 - Jury composé de 2 professionnels (1 développeur + 1 manager/lead)
 

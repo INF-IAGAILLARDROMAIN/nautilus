@@ -15,6 +15,7 @@ import { ListPageHeader } from "@/components/list-page-header";
 import { AutocompleteInput } from "@/components/autocomplete-input";
 import { FORFAITS, CATEGORIES_DEVIS } from "@/lib/data/forfaits";
 import { api, type CreateDevisInput } from "@/lib/api";
+import { formatEuro } from "@/lib/format";
 
 // Schéma de validation du formulaire Devis
 //
@@ -54,13 +55,6 @@ function defaultDateValidite(): string {
   const d = new Date();
   d.setDate(d.getDate() + 30);
   return d.toISOString().slice(0, 10);
-}
-
-function formatEuro(value: number) {
-  return value.toLocaleString("fr-FR", {
-    style: "currency",
-    currency: "EUR",
-  });
 }
 
 // useSearchParams() est appelé dans le composant pour lire ?clientId=...&bateauId=...

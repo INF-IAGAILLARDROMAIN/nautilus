@@ -1,7 +1,6 @@
 "use client";
 
 import { use, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -22,23 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ListPageHeader } from "@/components/list-page-header";
 import { api, type StatutDevis } from "@/lib/api";
-
-function formatEuro(value: string | number) {
-  const n = typeof value === "string" ? parseFloat(value) : value;
-  return n.toLocaleString("fr-FR", {
-    style: "currency",
-    currency: "EUR",
-  });
-}
-
-function formatDate(iso: string | null) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
+import { formatEuro, formatDate } from "@/lib/format";
 
 const STATUT_LABELS: Record<
   StatutDevis,
@@ -196,7 +179,7 @@ export default function DevisDetailPage({
                   className="bg-chart-3 hover:bg-chart-3/90 text-white"
                 >
                   <Check className="h-4 w-4 mr-2" />
-                  Valider (crée l'OR)
+                  Valider (crée l&apos;OR)
                 </Button>
               </>
             )}
@@ -209,7 +192,7 @@ export default function DevisDetailPage({
                   className="bg-chart-3 hover:bg-chart-3/90 text-white"
                 >
                   <Check className="h-4 w-4 mr-2" />
-                  Valider (crée l'OR)
+                  Valider (crée l&apos;OR)
                 </Button>
                 <Button
                   onClick={() => updateStatut.mutate("REFUSE")}
@@ -231,7 +214,7 @@ export default function DevisDetailPage({
                 variant="outline"
               >
                 <Wrench className="h-4 w-4 mr-2" />
-                Voir l'OR créé
+                Voir l&apos;OR créé
               </Button>
             )}
 

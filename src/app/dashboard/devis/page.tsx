@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { ListPageHeader } from "@/components/list-page-header";
 import { normalizeForSearch } from "@/lib/data/marques";
 import { api, type Devis, type StatutDevis } from "@/lib/api";
+import { formatEuro } from "@/lib/format";
 
 function statutBadge(statut: StatutDevis) {
   switch (statut) {
@@ -33,14 +34,6 @@ function statutBadge(statut: StatutDevis) {
         label: "Refusé",
       };
   }
-}
-
-function formatEuro(value: string | number) {
-  const n = typeof value === "string" ? parseFloat(value) : value;
-  return n.toLocaleString("fr-FR", {
-    style: "currency",
-    currency: "EUR",
-  });
 }
 
 export default function DevisListPage() {

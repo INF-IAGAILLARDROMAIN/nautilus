@@ -275,6 +275,20 @@ export const api = {
         method: "PATCH",
         body: JSON.stringify({ mecano }),
       }),
+    update: (
+      id: string,
+      payload: Partial<{
+        type: TypeOR;
+        urgence: UrgenceOR;
+        description: string | null;
+        dateDebut: string | null;
+        dateFin: string | null;
+      }>,
+    ) =>
+      request<OrdreReparation>(`/or/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      }),
     /**
      * Télécharge le PDF de l'OR (document interne pour le mécano).
      * Cases à cocher, zone observations, signature mécano.

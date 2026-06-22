@@ -1,6 +1,6 @@
 # Arguments oraux pour l'examen Studi du 29/06/2026
 
-> Document **vivant** : centralise toutes les phrases prêtes à dire au jury pendant la démo orale (45 min).
+> Document **vivant** : centralise toutes les phrases prêtes à dire au jury pendant la présentation projet (35 min officielles France Compétences).
 > Mis à jour à chaque nouvelle décision/explication importante prise pendant le développement.
 > Toutes les phrases sont en **français** (l'oral se passe en français).
 > Dernière mise à jour : **2026-06-08**.
@@ -147,6 +147,10 @@
 
 > *"À la création automatique d'un OR depuis un devis validé, le type par défaut est REPARATION car la majorité des interventions en sont. Mais ce comportement doit évoluer : idéalement, le type devrait être demandé au chef d'atelier lors de la validation du devis (entretien planifié, panne, hivernage, déshivernage, dépannage), pour qu'il soit cohérent dès le départ. C'est une amélioration documentée pour la V2."*
 
+### 4.10 Statut d'OR — workflow strict unidirectionnel
+
+> *"Le statut d'un OR ne se modifie pas via un select libre, mais via un bouton de transition unique qui suit le workflow métier : Créé → En cours → Terminé → Facturé. On ne peut ni sauter une étape ni revenir en arrière. C'est volontaire : un OR Facturé a déjà déclenché l'émission d'un numéro de facture séquentiel envoyé au client — le faire repasser à 'En cours' créerait une incohérence comptable. C'est un invariant métier appliqué côté UI, et garanti aussi côté back via les guards et la séquence de numérotation. Pour les autres champs (type, urgence, description, dates), l'utilisateur peut éditer librement via un bouton 'Modifier' tant que l'OR n'est pas Facturé."*
+
 ---
 
 ## 🧠 5 — Méthodologie & process
@@ -166,6 +170,32 @@
 ### 5.4 Git workflow protégé (dev / main)
 
 > *"Je travaille toujours sur la branche `dev`. La branche `main` est protégée et chaque merge nécessite la validation explicite de mon lead développeur Fabien Leyrissoux. Chaque commit sur main déclenche un déploiement Vercel coûteux, donc on contrôle strictement. Tous mes commits sont conventionnels et descriptifs."*
+
+### 5.5 Audit des logs IA : qui consulte quoi (correction 16/06/2026)
+
+> *« Les refus de sécurité IA sont logués en MongoDB, mais la **séparation des rôles** est nette. Le **chef d'atelier voit le bandeau rouge en temps réel** quand quelqu'un tente un détournement, c'est sa seule interaction avec la sécurité IA — un mécano nautique n'a rien à faire dans une console d'audit. La **consultation de l'historique** est réservée à l'**éditeur RANKIA**, c'est-à-dire moi en tant que développeur, via la console MongoDB Atlas. Je peux générer un rapport à la demande du chef d'atelier en cas d'incident sérieux. Cette séparation est volontaire : elle respecte le RGPD (l'éditeur reste responsable du traitement des traces) et elle évite d'étaler le scope V1 avec une page admin qui n'aurait été ni filtrable, ni paginée, ni testée. **L'interface graphique de consultation est explicitement reportée en V2 RANKIA.** »*
+
+### 5.6 Compte exact des intents IA (correction 16/06/2026)
+
+> *« Le module Recherche IA contient **23 intents** : 19 intents métier — dont un `fallback` technique qui prend le relais quand aucun autre ne matche —, 3 intents UX (`salutation`, `help`, `hors_domaine`) et 1 intent sécurité (`securite_refus`). Le pattern Intent + Entities garantit que **le LLM ne génère jamais de SQL** : il choisit dans cette liste fermée et c'est mon code NestJS qui exécute la requête Prisma typée correspondante. »*
+
+### 5.7 Positionnement marché — POC V1 / V2 commerciale ambitieuse (correction 17/06/2026)
+
+> *« Le marché des CRM nautiques compte plusieurs acteurs établis qui tracent **très bien** la donnée — la traçabilité n'est pas le problème métier. Le problème, c'est l'**accès à l'information**.*
+>
+> *Je suis clair sur le positionnement de Nautilus : **en V1, c'est un proof of concept**. Un démonstrateur sérieux de l'agent IA souverain, monté autour d'une vraie brique CRM fonctionnelle (clients, bateaux, devis, OR, factures). Cette V1 prouve que la vision est techniquement viable — architecture sécurisée OWASP, défense en profondeur, cohabitation SQL/NoSQL, agent IA classifier sans pouvoir SQL.*
+>
+> *Mais ce n'est pas un produit commercialisable aujourd'hui. L'**ambition RANKIA**, c'est la V2 : multi-tenant, multi-rôles, scan OCR, email automatique. C'est là que Nautilus deviendra une alternative complète aux CRM établis pour les ateliers qui veulent moderniser leur gestion. C'est mon ancien métier de mécanicien nautique qui m'a fait identifier ce besoin : même dans un atelier bien outillé, la friction n'est pas dans le stockage, elle est dans la récupération de l'info. »*
+
+### 5.8 Modèle d'accès — RBAC à 3 rôles métier + casquette Admin séparée
+
+**Contexte** : si le jury demande « qui est admin ? », « comment supervisez-vous les utilisateurs ? », « avez-vous une page d'administration ? ».
+
+> *« Nautilus implémente un modèle d'accès séparant deux dimensions : le **rôle métier** — Client, Mécano, ou Chef d'atelier — qui définit ce que la personne fait dans l'atelier, et une **casquette Admin** séparée — cochable indépendamment du rôle métier — qui donne le droit de gérer les autres utilisateurs.*
+>
+> *Cette séparation est volontaire : c'est l'entreprise qui décide qui est admin. Dans certains ateliers, c'est le chef qui assume cette casquette ; dans d'autres, c'est un mécano senior plus à l'aise avec le numérique. Nautilus n'impose pas de hiérarchie informatique calquée sur la hiérarchie métier.*
+>
+> *Une **page Administration** est livrée en V1, accessible depuis la sidebar et le menu mobile. Elle affiche l'utilisateur connecté avec son rôle et sa casquette, et présente la liste des rôles disponibles. La création et la modification d'utilisateurs sont volontairement désactivées — l'UI est posée pour démontrer la vision produit, l'activation back est dans la roadmap V2 RANKIA commerciale (invitations par email magic link, Guards NestJS par rôle, filtrage front conditionnel). »*
 
 ---
 
@@ -187,5 +217,5 @@
 
 - **Apprendre les phrases tel quel** : elles sont déjà optimisées (concises, précises, défendables).
 - **Adapter au feeling du jury** : si le jury veut plus de détail, dérouler la sous-partie correspondante.
-- **Ne pas tout dire** : sélectionner 5-10 phrases-clés par bloc de démo (45 min au total).
+- **Ne pas tout dire** : sélectionner 5-10 phrases-clés par bloc de démo (35 min au total — source officielle France Compétences).
 - **Lire ce document avant chaque répétition d'oral** (S4 — semaine du 23-28/06).
